@@ -5657,6 +5657,12 @@
 		(uuid "9935da92-d16d-49d6-af19-4fca53e340c3")
 	)
 	(junction
+		(at 134.62 119.38)
+		(diameter 0)
+		(color 0 0 0 0)
+		(uuid "99bf5ee1-7e6b-4ef5-a2a2-d8bff3a8c35a")
+	)
+	(junction
 		(at 157.48 64.77)
 		(diameter 0)
 		(color 0 0 0 0)
@@ -6235,6 +6241,16 @@
 			(type default)
 		)
 		(uuid "4433842f-bf07-4942-abe6-b7c9ed21d79e")
+	)
+	(wire
+		(pts
+			(xy 134.62 119.38) (xy 142.24 119.38)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "49242027-7e80-4d77-9653-b35413bc8ee6")
 	)
 	(wire
 		(pts
@@ -7689,6 +7705,17 @@
 		)
 		(uuid "19c8e867-0baa-40d8-9055-aeb8bdb0576c")
 	)
+	(text "Issues\n- No 3V3 PWR LED\n- Battery screen print -ve/+ve wrong way round\n- 1.25V_REF not connected to ADC_VREF on MCU\n- 1.25V ref does not work when connected as it requires a low impedance drive."
+		(exclude_from_sim no)
+		(at 118.872 24.384 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid "1d8b85bd-d208-45f3-931e-258af2a5a46f")
+	)
 	(text "GND"
 		(exclude_from_sim no)
 		(at 219.456 145.288 0)
@@ -8427,6 +8454,16 @@
 			(justify right bottom)
 		)
 		(uuid "b0954e5b-a3e5-4c7d-8552-2028f3e7d623")
+	)
+	(label "1.25V_REF"
+		(at 142.24 119.38 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "b49f2e88-c190-4e6b-8482-69f5a27c3a4c")
 	)
 	(label "GPIO16"
 		(at 143.51 154.94 0)
@@ -9984,7 +10021,7 @@
 				(justify left)
 			)
 		)
-		(property "Value" "120k"
+		(property "Value" "0R"
 			(at 109.22 76.1999 0)
 			(effects
 				(font
@@ -10465,7 +10502,7 @@
 				(justify left)
 			)
 		)
-		(property "Value" "68k"
+		(property "Value" "DNF"
 			(at 101.6 85.09 0)
 			(effects
 				(font
@@ -12347,7 +12384,7 @@
 			)
 		)
 		(property "Value" "Conn_01x10"
-			(at 250.19 63.4999 0)
+			(at 241.3 78.486 0)
 			(effects
 				(font
 					(size 1.27 1.27)

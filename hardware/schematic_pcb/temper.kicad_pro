@@ -516,8 +516,8 @@
       "gencad": "",
       "idf": "",
       "netlist": "",
-      "plot": "gerbers/",
-      "pos_files": "gerbers",
+      "plot": "",
+      "pos_files": "",
       "specctra_dsn": "",
       "step": "",
       "svg": "",
@@ -527,7 +527,7 @@
   },
   "schematic": {
     "annotate_start_num": 0,
-    "bom_export_filename": "temper.csv",
+    "bom_export_filename": "bom.csv",
     "bom_fmt_presets": [],
     "bom_fmt_settings": {
       "field_delimiter": ",",
@@ -626,7 +626,7 @@
     },
     "net_format_name": "",
     "page_layout_descr_file": "",
-    "plot_directory": "/home/pja/git-repos/temper/hardware/schematic_pcb/",
+    "plot_directory": "",
     "spice_current_sheet_as_root": false,
     "spice_external_command": "spice \"%I\"",
     "spice_model_current_sheet_as_root": true,

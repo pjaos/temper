@@ -11616,8 +11616,8 @@
 			(layer "B.SilkS")
 			(uuid "e93fb5df-8c62-4735-b6cf-9dcf894729fc")
 		)
-		(fp_text user "-ve"
-			(at -34.75 4 -90)
+		(fp_text user "BAT +VE"
+			(at -33.02 4 270)
 			(unlocked yes)
 			(layer "B.SilkS")
 			(uuid "059b1678-d879-4257-a379-5585303d1685")
@@ -11629,8 +11629,8 @@
 				(justify left bottom mirror)
 			)
 		)
-		(fp_text user "+ve"
-			(at 37.25 4 -90)
+		(fp_text user "GND"
+			(at 37.25 4 270)
 			(unlocked yes)
 			(layer "B.SilkS")
 			(uuid "c943d27e-76de-4b97-a913-25f283f06155")
