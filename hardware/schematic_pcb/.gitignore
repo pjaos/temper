@@ -27,3 +27,5 @@ fp-info-cache
 schematic.pdf
 temper-backups
 *.lck
+
+temper-*
