@@ -100,7 +100,7 @@ class ThisMachine(BaseMachine):
 
         # Connect this machine to a WiFi network.
         # Note that the WiFi setup claims two GPIO pins. See _sta_connect_wifi doc for more info.
-        self._sta_connect_wifi()
+        self._sta_connect_wifi(wifi_setup_gpio=0, wifi_led_gpio=2, bluetooth_led_gpio=4)
 
         # Start task that looks for user press of the reset to defaults button press
         asyncio.create_task(self._check_factory_Defaults_task())
@@ -119,6 +119,7 @@ class ThisMachine(BaseMachine):
 
         # Call the app task to execute your projects functionality.
         asyncio.create_task(self.app_task())
+#        asyncio.create_task(self.app_task_pico())
 
         self._web_server.run()
 
@@ -134,20 +135,21 @@ class ThisMachine(BaseMachine):
     async def app_task_pico(self):
         """@brief Add your project code here.
                   Make sure await asyncio.sleep(1) is called frequently to ensure other tasks get CPU time."""
-        Pin(22, Pin.OUT, value=1)
-        Pin(5, Pin.OUT, value=1)
+        Pin(32, Pin.OUT, value=0)
+        Pin(13, Pin.OUT, value=1)
 
-        sensor1 = dht.DHT22(Pin(0, Pin.OUT, Pin.PULL_UP))
-        sensor2 = dht.DHT22(Pin(1, Pin.OUT, Pin.PULL_UP))
-        sensor3 = dht.DHT22(Pin(2, Pin.OUT, Pin.PULL_UP))
-        sensor4 = dht.DHT22(Pin(3, Pin.OUT, Pin.PULL_UP))
+        sensor1 = dht.DHT22(Pin(16, Pin.OUT, Pin.PULL_UP))
+        sensor2 = dht.DHT22(Pin(17, Pin.OUT, Pin.PULL_UP))
+        sensor3 = dht.DHT22(Pin(18, Pin.OUT, Pin.PULL_UP))
+        sensor4 = dht.DHT22(Pin(19, Pin.OUT, Pin.PULL_UP))
 
-        # PD resistor values
-        scale_vbat = 3.47238
+        # scaling factors for voltages
+        scale_vbat = 3801.7
+        scale_3v3 = 5027.6
 
-        adc_vbat = ADC(Pin(26))
-        adc_3v3 = ADC(Pin(27))
-        adc_mcp9700 = ADC(Pin(28))
+        adc_vbat = ADC(Pin(34, Pin.IN))
+        adc_3v3 = ADC(Pin(35, Pin.IN))
+        adc_mcp9700 = ADC(Pin(25, Pin.IN))
 
         paramDict = {ThisMachine.PARAM_3V3: "",
                      ThisMachine.PARAM_VBAT: "",
@@ -164,41 +166,46 @@ class ThisMachine(BaseMachine):
         self._web_server.setParamDict(paramDict)
 
         while True:
-            value_3v3 = adc_3v3.read_u16()              # Read 16-bit analog value (0-65535)
-            voltage_3v3 = value_3v3 * 3.312 / 65535     # Convert to voltage (assuming 3.3V reference)
-            paramDict[ThisMachine.PARAM_3V3] = f"{voltage_3v3:.3f}"
+            try:
+                value_3v3 = adc_3v3.read_u16()
+                voltage_3v3 = value_3v3 / scale_3v3
+                paramDict[ThisMachine.PARAM_3V3] = f"{voltage_3v3:.3f}"
 
-            value_vbat = adc_vbat.read_u16()            # Read 16-bit analog value (0-65535)
-            voltage_vbat = value_vbat * 3.312 / 65535   # Convert to voltage (assuming 3.3V reference)
-            voltage_vbat = voltage_vbat * scale_vbat
-            paramDict[ThisMachine.PARAM_VBAT] = f"{voltage_vbat:.3f}"
+                value_vbat = adc_vbat.read_u16()
+                voltage_vbat = value_vbat / scale_vbat
+                paramDict[ThisMachine.PARAM_VBAT] = f"{voltage_vbat:.3f}"
 
-            adc_value = adc_mcp9700.read_u16()
-            volts = adc_value/ThisMachine.ADC_CODES_TO_MV
-            board_temp_c = ( volts - ThisMachine.MCP9700_VOUT_0C ) / ThisMachine.MCP9700_TC
-            paramDict[ThisMachine.PARAM_BOARD_TEMP] = f"{board_temp_c:.1f}"
+                adc_value = adc_mcp9700.read_u16()
+                #volts = adc_value/ThisMachine.ADC_CODES_TO_MV
+                # board_temp_c = ( volts - ThisMachine.MCP9700_VOUT_0C ) / ThisMachine.MCP9700_TC
+                # PJA paramDict[ThisMachine.PARAM_BOARD_TEMP] = f"{board_temp_c:.1f}"
+                paramDict[ThisMachine.PARAM_BOARD_TEMP] = f"{adc_value}"
 
-            sensor1.measure()
-            await asyncio.sleep(.1)
-            sensor2.measure()
-            await asyncio.sleep(.1)
-            sensor3.measure()
-            await asyncio.sleep(.1)
-            sensor4.measure()
+                sensor1.measure()
+                await asyncio.sleep(.1)
+                sensor2.measure()
+                await asyncio.sleep(.1)
+                sensor3.measure()
+                await asyncio.sleep(.1)
+                sensor4.measure()
 
-            paramDict[ThisMachine.PARAM_SENSOR_1_TEMP] = sensor1.temperature()
-            paramDict[ThisMachine.PARAM_SENSOR_1_HUMIDITY] = sensor1.humidity()
+                paramDict[ThisMachine.PARAM_SENSOR_1_TEMP] = sensor1.temperature()
+                paramDict[ThisMachine.PARAM_SENSOR_1_HUMIDITY] = sensor1.humidity()
 
-            paramDict[ThisMachine.PARAM_SENSOR_2_TEMP] = sensor2.temperature()
-            paramDict[ThisMachine.PARAM_SENSOR_2_HUMIDITY] = sensor2.humidity()
+                paramDict[ThisMachine.PARAM_SENSOR_2_TEMP] = sensor2.temperature()
+                paramDict[ThisMachine.PARAM_SENSOR_2_HUMIDITY] = sensor2.humidity()
 
-            paramDict[ThisMachine.PARAM_SENSOR_3_TEMP] = sensor3.temperature()
-            paramDict[ThisMachine.PARAM_SENSOR_3_HUMIDITY] = sensor3.humidity()
+                paramDict[ThisMachine.PARAM_SENSOR_3_TEMP] = sensor3.temperature()
+                paramDict[ThisMachine.PARAM_SENSOR_3_HUMIDITY] = sensor3.humidity()
 
-            paramDict[ThisMachine.PARAM_SENSOR_4_TEMP] = sensor4.temperature()
-            paramDict[ThisMachine.PARAM_SENSOR_4_HUMIDITY] = sensor4.humidity()
+                paramDict[ThisMachine.PARAM_SENSOR_4_TEMP] = sensor4.temperature()
+                paramDict[ThisMachine.PARAM_SENSOR_4_HUMIDITY] = sensor4.humidity()
+                print(f"PJA: paramDict={paramDict}")
 
-            self._ydev.update_json_dict(paramDict)
+                self._ydev.update_json_dict(paramDict)
+
+            except Exception as ex:
+                self.error(str(ex))
 
             # Don't read DHT22 sensors more than once every 2 seconds.
             await asyncio.sleep(2)

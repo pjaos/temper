@@ -310,6 +310,20 @@ class WebServer():
         # !!! This does not always work
         machine.reset()
 
+    def powerCycle(self):
+        """@brief Power down the 3V3 rail for a time."""
+        os.sync()
+        _thread.start_new_thread(self._doPwrCycle, ())
+        responseDict = WebServer.GetOKDict()
+        responseDict["INFO"] = "PowerCycle in progress..."
+        return responseDict
+
+    def _doPwrCycle(self):
+        """@brief Perform a device restart."""
+        self._uo.info("PowerCycling now.")
+        sleep(0.25)
+        machine.Pin(33, machine.Pin.OUT, value=1)
+
     def resetToDefaultConfig(self):
         """@reset the configuration to defaults."""
         self._machine_config.set_defaults()
@@ -522,12 +536,16 @@ class WebServer():
         async def gc(request):
             return get_json(self.collectGarbage())
 
+        @app.route('/powercycle')
+        async def powercycle(request):
+            return get_json(self.powerCycle())
+
         @app.route('/shutdown')
         async def shutdown(request):
             request.app.shutdown()
             return get_json(WebServer.GetErrorDict("The server is shutting down..."))
 
-        # The ability to seth the WebREPL password over the REST interface is a clear security hole.
+        # The ability to set the WebREPL password over the REST interface is a clear security hole.
         # This is why this is commented out by default. Remove the comment lines with care.
 #        @app.route('/setwebreplpw')
 #        async def set_webrepl_password(request):
