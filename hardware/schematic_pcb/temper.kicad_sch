@@ -8445,7 +8445,7 @@
 				(justify left)
 			)
 		)
-		(property "Footprint" "PJA_Connectors:18650_battery_holder"
+		(property "Footprint" "PJA_Connectors:18650_26700_battery_holder"
 			(at 200.66 59.436 90)
 			(effects
 				(font
