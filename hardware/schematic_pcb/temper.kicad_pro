@@ -60,7 +60,35 @@
       ],
       "drc_exclusions": [
         [
-          "silk_overlap|145273809|97740000|97cc923e-8090-462e-9234-0adf829020a8|e008e36a-7d2a-4266-a592-f292674fa894",
+          "extra_footprint|134000000|145250000|571e1a31-f0b6-4b1d-ab42-59b8ba424891|00000000-0000-0000-0000-000000000000",
+          ""
+        ],
+        [
+          "extra_footprint|134000000|56750000|800501fd-7e6f-4225-b5d6-69f109c46055|00000000-0000-0000-0000-000000000000",
+          ""
+        ],
+        [
+          "extra_footprint|156000000|56750000|359ec604-dead-42ff-bcf4-4ee25558bd5d|00000000-0000-0000-0000-000000000000",
+          ""
+        ],
+        [
+          "extra_footprint|162000000|145250000|d73132de-df72-496c-8087-315c888b3daf|00000000-0000-0000-0000-000000000000",
+          ""
+        ],
+        [
+          "starved_thermal|133000000|102250000|ce95f7c4-23c1-463e-9ff9-9cfca7131390|d9dc913c-c90d-413b-bc0a-5e980f857e6e|F.Cu",
+          ""
+        ],
+        [
+          "starved_thermal|133000000|78250000|ce95f7c4-23c1-463e-9ff9-9cfca7131390|36c73ec7-e3b2-4341-80c2-3fb1ba4b68af|F.Cu",
+          ""
+        ],
+        [
+          "starved_thermal|141152500|96750000|ce95f7c4-23c1-463e-9ff9-9cfca7131390|7b653ee6-8530-459e-8660-25923b6e2916|F.Cu",
+          ""
+        ],
+        [
+          "starved_thermal|141200000|100902500|ce95f7c4-23c1-463e-9ff9-9cfca7131390|45528c85-85d4-4837-b660-15684d6bf424|F.Cu",
           ""
         ]
       ],
@@ -533,7 +561,7 @@
   },
   "schematic": {
     "annotate_start_num": 0,
-    "bom_export_filename": "temper_bom.csv",
+    "bom_export_filename": "temper.csv",
     "bom_fmt_presets": [],
     "bom_fmt_settings": {
       "field_delimiter": ",",
@@ -595,6 +623,12 @@
           "label": "Description",
           "name": "Description",
           "show": false
+        },
+        {
+          "group_by": false,
+          "label": "LCSC",
+          "name": "LCSC",
+          "show": true
         }
       ],
       "filter_string": "",
