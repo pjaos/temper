@@ -5,8 +5,8 @@
 	(uuid "ad9b79b0-4738-4cc8-a254-afb39ba62b16")
 	(paper "A4")
 	(title_block
-		(date "2025-11-10")
-		(rev "1.5")
+		(date "2026-03-23")
+		(rev "1.7")
 	)
 	(lib_symbols
 		(symbol "Connector_Generic:Conn_01x02"
@@ -1173,6 +1173,142 @@
 			)
 			(embedded_fonts no)
 		)
+		(symbol "Device:Fuse"
+			(pin_numbers
+				(hide yes)
+			)
+			(pin_names
+				(offset 0)
+			)
+			(exclude_from_sim no)
+			(in_bom yes)
+			(on_board yes)
+			(property "Reference" "F"
+				(at 2.032 0 90)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Value" "Fuse"
+				(at -1.905 0 90)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Footprint" ""
+				(at -1.778 0 90)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "Datasheet" "~"
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "Description" "Fuse"
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "ki_keywords" "fuse"
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "ki_fp_filters" "*Fuse*"
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(symbol "Fuse_0_1"
+				(rectangle
+					(start -0.762 -2.54)
+					(end 0.762 2.54)
+					(stroke
+						(width 0.254)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy 0 2.54) (xy 0 -2.54)
+					)
+					(stroke
+						(width 0)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+			)
+			(symbol "Fuse_1_1"
+				(pin passive line
+					(at 0 3.81 270)
+					(length 1.27)
+					(name "~"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "1"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin passive line
+					(at 0 -3.81 90)
+					(length 1.27)
+					(name "~"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "2"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+			)
+			(embedded_fonts no)
+		)
 		(symbol "Device:LED"
 			(pin_numbers
 				(hide yes)
@@ -1347,6 +1483,155 @@
 			)
 			(embedded_fonts no)
 		)
+		(symbol "Device:Polyfuse"
+			(pin_numbers
+				(hide yes)
+			)
+			(pin_names
+				(offset 0)
+			)
+			(exclude_from_sim no)
+			(in_bom yes)
+			(on_board yes)
+			(property "Reference" "F"
+				(at -2.54 0 90)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Value" "Polyfuse"
+				(at 2.54 0 90)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Footprint" ""
+				(at 1.27 -5.08 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(justify left)
+					(hide yes)
+				)
+			)
+			(property "Datasheet" "~"
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "Description" "Resettable fuse, polymeric positive temperature coefficient"
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "ki_keywords" "resettable fuse PTC PPTC polyfuse polyswitch"
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "ki_fp_filters" "*polyfuse* *PTC*"
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(symbol "Polyfuse_0_1"
+				(polyline
+					(pts
+						(xy -1.524 2.54) (xy -1.524 1.524) (xy 1.524 -1.524) (xy 1.524 -2.54)
+					)
+					(stroke
+						(width 0)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(rectangle
+					(start -0.762 2.54)
+					(end 0.762 -2.54)
+					(stroke
+						(width 0.254)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy 0 2.54) (xy 0 -2.54)
+					)
+					(stroke
+						(width 0)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+			)
+			(symbol "Polyfuse_1_1"
+				(pin passive line
+					(at 0 3.81 270)
+					(length 1.27)
+					(name "~"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "1"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin passive line
+					(at 0 -3.81 90)
+					(length 1.27)
+					(name "~"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "2"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+			)
+			(embedded_fonts no)
+		)
 		(symbol "Device:R"
 			(pin_numbers
 				(hide yes)
@@ -1454,6 +1739,156 @@
 					(at 0 -3.81 90)
 					(length 1.27)
 					(name "~"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "2"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+			)
+			(embedded_fonts no)
+		)
+		(symbol "Diode:1N5819"
+			(pin_numbers
+				(hide yes)
+			)
+			(pin_names
+				(offset 1.016)
+				(hide yes)
+			)
+			(exclude_from_sim no)
+			(in_bom yes)
+			(on_board yes)
+			(property "Reference" "D"
+				(at 0 2.54 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Value" "1N5819"
+				(at 0 -2.54 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Footprint" "Diode_THT:D_DO-41_SOD81_P10.16mm_Horizontal"
+				(at 0 -4.445 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "Datasheet" "http://www.vishay.com/docs/88525/1n5817.pdf"
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "Description" "40V 1A Schottky Barrier Rectifier Diode, DO-41"
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "ki_keywords" "diode Schottky"
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "ki_fp_filters" "D*DO?41*"
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(symbol "1N5819_0_1"
+				(polyline
+					(pts
+						(xy -1.905 0.635) (xy -1.905 1.27) (xy -1.27 1.27) (xy -1.27 -1.27) (xy -0.635 -1.27) (xy -0.635 -0.635)
+					)
+					(stroke
+						(width 0.254)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy 1.27 1.27) (xy 1.27 -1.27) (xy -1.27 0) (xy 1.27 1.27)
+					)
+					(stroke
+						(width 0.254)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy 1.27 0) (xy -1.27 0)
+					)
+					(stroke
+						(width 0)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+			)
+			(symbol "1N5819_1_1"
+				(pin passive line
+					(at -3.81 0 0)
+					(length 2.54)
+					(name "K"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "1"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin passive line
+					(at 3.81 0 180)
+					(length 2.54)
+					(name "A"
 						(effects
 							(font
 								(size 1.27 1.27)
@@ -4538,6 +4973,17 @@
 		)
 		(uuid "7c4f58f7-8308-48ba-8486-543411ada153")
 	)
+	(text "This maybe an external 5V input (I.E from a USB connector).\nOr it may be connected to an external LION cell charger\nproviding 4.2V Max to charge a LION cell."
+		(exclude_from_sim no)
+		(at 27.432 189.992 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid "7de057b7-5b06-4682-9b00-393c3233d2a3")
+	)
 	(text "FACTORY DEFAULTS"
 		(exclude_from_sim no)
 		(at 172.974 157.226 0)
@@ -4644,11 +5090,34 @@
 		)
 		(uuid "e4cd57ce-20b7-4146-9e6b-6dc372cdbd77")
 	)
+	(text "D5 is fitted only if the 5V connector is actually connected to an \nexternal LION cell charger. \n\nIn this case the usb battery power module connected to J7\nshould not have U1 fitted.\n"
+		(exclude_from_sim no)
+		(at 169.926 27.178 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid "ea5e3faf-e0c2-42b3-be76-b3c6cb928781")
+	)
 	(junction
 		(at 226.06 66.04)
 		(diameter 0)
 		(color 0 0 0 0)
 		(uuid "0ee55aa0-0176-4fa3-ae60-eb2ffb155c5b")
+	)
+	(junction
+		(at 194.31 40.64)
+		(diameter 0)
+		(color 0 0 0 0)
+		(uuid "12c364ba-c097-4131-a260-1890e8c59c3f")
+	)
+	(junction
+		(at 200.66 40.64)
+		(diameter 0)
+		(color 0 0 0 0)
+		(uuid "1e45c065-3d44-4c19-b705-85f3f3d68ba7")
 	)
 	(junction
 		(at 204.47 158.75)
@@ -4813,6 +5282,12 @@
 		(uuid "8887413a-4dd8-4bbd-bc84-972a4e9a0736")
 	)
 	(junction
+		(at 184.15 40.64)
+		(diameter 0)
+		(color 0 0 0 0)
+		(uuid "8ff1fa51-ea9b-4208-8b47-9a521499600d")
+	)
+	(junction
 		(at 153.67 182.88)
 		(diameter 0)
 		(color 0 0 0 0)
@@ -4843,6 +5318,12 @@
 		(uuid "ba198fe4-5cfe-4ee1-b599-8ace141596c2")
 	)
 	(junction
+		(at 200.66 53.34)
+		(diameter 0)
+		(color 0 0 0 0)
+		(uuid "c4daaa1d-e027-4cb3-83d8-369aa284ab64")
+	)
+	(junction
 		(at 71.12 163.83)
 		(diameter 0)
 		(color 0 0 0 0)
@@ -4871,12 +5352,6 @@
 		(diameter 0)
 		(color 0 0 0 0)
 		(uuid "d9667d30-096d-40bd-b772-44cdf4d28b30")
-	)
-	(junction
-		(at 203.2 53.34)
-		(diameter 0)
-		(color 0 0 0 0)
-		(uuid "dddb3d94-eef7-475d-a1a7-4658b2720555")
 	)
 	(junction
 		(at 71.12 182.88)
@@ -4969,6 +5444,16 @@
 			(type default)
 		)
 		(uuid "007aec21-f5f1-4d4f-8c7e-be1437c1c5c1")
+	)
+	(wire
+		(pts
+			(xy 200.66 40.64) (xy 200.66 43.18)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "007f9b31-dfe9-4b6f-832e-0d8809c97ec6")
 	)
 	(wire
 		(pts
@@ -5362,6 +5847,16 @@
 	)
 	(wire
 		(pts
+			(xy 194.31 53.34) (xy 200.66 53.34)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "32200575-aa56-42c9-b779-fc3561af1842")
+	)
+	(wire
+		(pts
 			(xy 231.14 124.46) (xy 231.14 129.54)
 		)
 		(stroke
@@ -5419,6 +5914,16 @@
 			(type default)
 		)
 		(uuid "38b609c6-e1fe-454c-a839-e8055a69fd46")
+	)
+	(wire
+		(pts
+			(xy 166.37 40.64) (xy 171.45 40.64)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "398c78f6-27cd-4e4c-b5f7-773c3e90a17d")
 	)
 	(wire
 		(pts
@@ -5552,6 +6057,16 @@
 	)
 	(wire
 		(pts
+			(xy 179.07 40.64) (xy 184.15 40.64)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "54051abc-0abc-4cd9-8c91-fad374a220e8")
+	)
+	(wire
+		(pts
 			(xy 234.95 90.17) (xy 241.3 90.17)
 		)
 		(stroke
@@ -5639,6 +6154,16 @@
 			(type default)
 		)
 		(uuid "60e5746a-7b7c-4efb-a515-543a3b36cfb1")
+	)
+	(wire
+		(pts
+			(xy 200.66 53.34) (xy 200.66 55.88)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "6109c6d0-4228-4c06-9cbc-946601a3b4d8")
 	)
 	(wire
 		(pts
@@ -5942,6 +6467,16 @@
 	)
 	(wire
 		(pts
+			(xy 194.31 50.8) (xy 194.31 53.34)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "80bd6e68-a76a-4712-93ec-697ee364986d")
+	)
+	(wire
+		(pts
 			(xy 204.47 146.05) (xy 204.47 144.78)
 		)
 		(stroke
@@ -6202,13 +6737,23 @@
 	)
 	(wire
 		(pts
-			(xy 203.2 40.64) (xy 184.15 40.64)
+			(xy 203.2 40.64) (xy 200.66 40.64)
 		)
 		(stroke
 			(width 0)
 			(type default)
 		)
 		(uuid "aea01386-08d3-4739-af76-5f49a7e1d579")
+	)
+	(wire
+		(pts
+			(xy 200.66 40.64) (xy 194.31 40.64)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "aee80572-79f7-4dfc-b3eb-5ec3ee2860a5")
 	)
 	(wire
 		(pts
@@ -6402,16 +6947,6 @@
 	)
 	(wire
 		(pts
-			(xy 203.2 53.34) (xy 200.66 53.34)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "c200cf32-02ee-4ecf-8f2a-3734bac33ad5")
-	)
-	(wire
-		(pts
 			(xy 171.45 68.58) (xy 170.18 68.58)
 		)
 		(stroke
@@ -6449,6 +6984,16 @@
 			(type default)
 		)
 		(uuid "c7084de2-0287-4edb-8daa-205b692cbd0c")
+	)
+	(wire
+		(pts
+			(xy 194.31 40.64) (xy 194.31 43.18)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "c7679bf0-f55c-4377-923d-3f6f5ff92e6b")
 	)
 	(wire
 		(pts
@@ -6532,6 +7077,16 @@
 	)
 	(wire
 		(pts
+			(xy 200.66 50.8) (xy 200.66 53.34)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "d1d778d7-3a50-4be8-916c-27712426ba76")
+	)
+	(wire
+		(pts
 			(xy 184.15 40.64) (xy 184.15 45.72)
 		)
 		(stroke
@@ -6549,16 +7104,6 @@
 			(type default)
 		)
 		(uuid "d89d2511-91fd-4d48-ae93-9ef3c53777c8")
-	)
-	(wire
-		(pts
-			(xy 200.66 53.34) (xy 200.66 55.88)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "d9be0f65-6231-433b-9dca-1bac8ce0a65c")
 	)
 	(wire
 		(pts
@@ -6679,6 +7224,16 @@
 			(type default)
 		)
 		(uuid "edac3396-8ea9-47fe-9377-eb09989482c7")
+	)
+	(wire
+		(pts
+			(xy 194.31 40.64) (xy 184.15 40.64)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "edbb1839-b959-4043-908e-a8633e0adf90")
 	)
 	(wire
 		(pts
@@ -6981,7 +7536,7 @@
 		(uuid "5bdee286-b43f-4a0b-95ff-0fc0d554003e")
 	)
 	(label "+VBAT"
-		(at 200.66 53.34 180)
+		(at 215.9 53.34 180)
 		(effects
 			(font
 				(size 1.27 1.27)
@@ -7179,6 +7734,28 @@
 			(justify left bottom)
 		)
 		(uuid "fabc2e5e-fa52-4934-bf2c-f3f2789063fe")
+	)
+	(global_label "+5v"
+		(shape input)
+		(at 166.37 40.64 180)
+		(fields_autoplaced yes)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right)
+		)
+		(uuid "3a354dd3-3cb7-47f4-bd60-c32b2d20e345")
+		(property "Intersheetrefs" "${INTERSHEET_REFS}"
+			(at 159.6353 40.64 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+				(hide yes)
+			)
+		)
 	)
 	(global_label "3v3"
 		(shape input)
@@ -7788,6 +8365,74 @@
 		)
 	)
 	(symbol
+		(lib_id "Diode:1N5819")
+		(at 175.26 40.64 180)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(uuid "25e26ac4-4daf-4694-a04b-98775d91e7aa")
+		(property "Reference" "D5"
+			(at 175.5775 34.29 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Value" "1N5819"
+			(at 175.5775 36.83 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" "Diode_SMD:D_SMA_Handsoldering"
+			(at 175.26 36.195 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" "http://www.vishay.com/docs/88525/1n5817.pdf"
+			(at 175.26 40.64 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" "40V 1A Schottky Barrier Rectifier Diode, DO-41"
+			(at 175.26 40.64 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "c3f98efd-a27f-4fc0-9740-aa2a9fdc9cf0")
+		)
+		(pin "2"
+			(uuid "9dbd7136-8ec5-48d2-b28e-660711c4b68b")
+		)
+		(instances
+			(project "temper"
+				(path "/ad9b79b0-4738-4cc8-a254-afb39ba62b16"
+					(reference "D5")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
 		(lib_id "Device:R")
 		(at 147.32 172.72 0)
 		(unit 1)
@@ -7937,7 +8582,7 @@
 			(uuid "0ff0ccdc-6a6a-4bff-8394-1484f60cf5bb")
 		)
 		(instances
-			(project ""
+			(project "temper"
 				(path "/ad9b79b0-4738-4cc8-a254-afb39ba62b16"
 					(reference "R4")
 					(unit 1)
@@ -8082,7 +8727,7 @@
 			(uuid "e43dbe7f-53d2-4b9e-b41d-a2d5155587ec")
 		)
 		(instances
-			(project ""
+			(project "temper"
 				(path "/ad9b79b0-4738-4cc8-a254-afb39ba62b16"
 					(reference "#PWR02")
 					(unit 1)
@@ -8164,6 +8809,76 @@
 			(project "temper"
 				(path "/ad9b79b0-4738-4cc8-a254-afb39ba62b16"
 					(reference "C7")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "Device:Polyfuse")
+		(at 200.66 46.99 0)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(uuid "3a827eb6-34a2-4c6b-8bc3-3026f50c463f")
+		(property "Reference" "F1"
+			(at 195.834 45.466 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Value" "3A"
+			(at 196.088 48.26 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Footprint" "PJA_Fuses:PTC_23mm_3mm_10.2mm_wire_spacing"
+			(at 201.93 52.07 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" "~"
+			(at 200.66 46.99 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" "Resettable fuse, polymeric positive temperature coefficient"
+			(at 200.66 46.99 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "11b150ae-b17c-4125-8bd5-1adb95f7710b")
+		)
+		(pin "2"
+			(uuid "d3df3fa3-5223-4bd5-a5b3-25760d079588")
+		)
+		(instances
+			(project "temper"
+				(path "/ad9b79b0-4738-4cc8-a254-afb39ba62b16"
+					(reference "F1")
 					(unit 1)
 				)
 			)
@@ -8319,7 +9034,7 @@
 			(uuid "0e78cd55-0752-4667-aa6f-96998b535948")
 		)
 		(instances
-			(project ""
+			(project "temper"
 				(path "/ad9b79b0-4738-4cc8-a254-afb39ba62b16"
 					(reference "D3")
 					(unit 1)
@@ -8402,9 +9117,78 @@
 			(uuid "75264ce8-434a-4d09-993e-98cd0ac7eae6")
 		)
 		(instances
-			(project ""
+			(project "temper"
 				(path "/ad9b79b0-4738-4cc8-a254-afb39ba62b16"
 					(reference "Q1")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "Device:Fuse")
+		(at 194.31 46.99 0)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(uuid "45a4a620-8ca7-403b-a868-37781cb7595e")
+		(property "Reference" "F2"
+			(at 190.5 45.212 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Value" "DNF"
+			(at 188.976 48.26 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Footprint" "PJA_Fuses:Scherter_OMT125"
+			(at 192.532 46.99 90)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" "~"
+			(at 194.31 46.99 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" "Fuse"
+			(at 194.31 46.99 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "2"
+			(uuid "398cc4aa-d32b-4370-9a59-74aaa4e790ec")
+		)
+		(pin "1"
+			(uuid "2063f0a0-c1c7-4f1a-a9d6-62a3a9051c57")
+		)
+		(instances
+			(project "temper"
+				(path "/ad9b79b0-4738-4cc8-a254-afb39ba62b16"
+					(reference "F2")
 					(unit 1)
 				)
 			)
@@ -8551,7 +9335,7 @@
 			(uuid "01e6c332-ac21-4c35-aeff-0616bd225f0f")
 		)
 		(instances
-			(project ""
+			(project "temper"
 				(path "/ad9b79b0-4738-4cc8-a254-afb39ba62b16"
 					(reference "J2")
 					(unit 1)
@@ -8711,7 +9495,7 @@
 			(uuid "6ffe1cfc-65a0-41ec-990a-2ce9f79311f4")
 		)
 		(instances
-			(project ""
+			(project "temper"
 				(path "/ad9b79b0-4738-4cc8-a254-afb39ba62b16"
 					(reference "M1")
 					(unit 1)
@@ -8875,7 +9659,7 @@
 			(uuid "0ee3ae3f-2f38-46d5-a9ee-cc29e722f27f")
 		)
 		(instances
-			(project ""
+			(project "temper"
 				(path "/ad9b79b0-4738-4cc8-a254-afb39ba62b16"
 					(reference "J7")
 					(unit 1)
@@ -8943,7 +9727,7 @@
 			(uuid "485ade7c-66b1-4df7-b0d4-35436050429a")
 		)
 		(instances
-			(project ""
+			(project "temper"
 				(path "/ad9b79b0-4738-4cc8-a254-afb39ba62b16"
 					(reference "JP2")
 					(unit 1)
@@ -9077,7 +9861,7 @@
 			(uuid "4707872e-100f-4e84-a8cd-376cbfea3cfb")
 		)
 		(instances
-			(project ""
+			(project "temper"
 				(path "/ad9b79b0-4738-4cc8-a254-afb39ba62b16"
 					(reference "R1")
 					(unit 1)
@@ -9226,7 +10010,7 @@
 			(uuid "d1b860fa-0253-4474-8727-49470481b22a")
 		)
 		(instances
-			(project ""
+			(project "temper"
 				(path "/ad9b79b0-4738-4cc8-a254-afb39ba62b16"
 					(reference "BT1")
 					(unit 1)
@@ -9376,7 +10160,7 @@
 			(uuid "b06c6349-66ad-4a33-9242-23afa8808c60")
 		)
 		(instances
-			(project ""
+			(project "temper"
 				(path "/ad9b79b0-4738-4cc8-a254-afb39ba62b16"
 					(reference "R10")
 					(unit 1)
@@ -9446,7 +10230,7 @@
 			(uuid "81bdca9d-ebf7-45b5-9980-d2995e75b242")
 		)
 		(instances
-			(project ""
+			(project "temper"
 				(path "/ad9b79b0-4738-4cc8-a254-afb39ba62b16"
 					(reference "C2")
 					(unit 1)
@@ -9524,7 +10308,7 @@
 			(uuid "3f4d3b65-820f-4e82-9023-eff080947456")
 		)
 		(instances
-			(project ""
+			(project "temper"
 				(path "/ad9b79b0-4738-4cc8-a254-afb39ba62b16"
 					(reference "SW3")
 					(unit 1)
@@ -9592,7 +10376,7 @@
 			(uuid "7e2f5df6-3c08-405a-a258-c5d3e32dff7c")
 		)
 		(instances
-			(project ""
+			(project "temper"
 				(path "/ad9b79b0-4738-4cc8-a254-afb39ba62b16"
 					(reference "JP1")
 					(unit 1)
@@ -9980,7 +10764,7 @@
 			(uuid "f136a422-69d0-4281-ab2d-c54eb0ebe791")
 		)
 		(instances
-			(project ""
+			(project "temper"
 				(path "/ad9b79b0-4738-4cc8-a254-afb39ba62b16"
 					(reference "J6")
 					(unit 1)
@@ -10275,7 +11059,7 @@
 			(uuid "226366cf-9ee2-411d-86ba-0ecb7349aa10")
 		)
 		(instances
-			(project ""
+			(project "temper"
 				(path "/ad9b79b0-4738-4cc8-a254-afb39ba62b16"
 					(reference "R5")
 					(unit 1)
@@ -10291,10 +11075,9 @@
 		(in_bom yes)
 		(on_board yes)
 		(dnp no)
-		(fields_autoplaced yes)
 		(uuid "c0357e34-cab1-4e5f-a12e-30ecbd2f2580")
 		(property "Reference" "R12"
-			(at 186.69 48.2599 0)
+			(at 178.816 48.26 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -10303,7 +11086,7 @@
 			)
 		)
 		(property "Value" "470R"
-			(at 186.69 50.7999 0)
+			(at 177.292 50.546 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -10354,7 +11137,7 @@
 			(uuid "3a905f26-28c5-4958-871e-70a10fd1b201")
 		)
 		(instances
-			(project ""
+			(project "temper"
 				(path "/ad9b79b0-4738-4cc8-a254-afb39ba62b16"
 					(reference "R12")
 					(unit 1)
@@ -10433,7 +11216,7 @@
 			(uuid "45c7747c-5e2e-4d75-aa8f-bcdf308530f5")
 		)
 		(instances
-			(project ""
+			(project "temper"
 				(path "/ad9b79b0-4738-4cc8-a254-afb39ba62b16"
 					(reference "C3")
 					(unit 1)
@@ -10512,7 +11295,7 @@
 			(uuid "e4118626-df0e-497d-b48c-17d24f632ae4")
 		)
 		(instances
-			(project ""
+			(project "temper"
 				(path "/ad9b79b0-4738-4cc8-a254-afb39ba62b16"
 					(reference "C4")
 					(unit 1)
@@ -10921,7 +11704,7 @@
 			(uuid "b3640ce3-cee9-49a8-ac33-b3bb9a61a360")
 		)
 		(instances
-			(project ""
+			(project "temper"
 				(path "/ad9b79b0-4738-4cc8-a254-afb39ba62b16"
 					(reference "U2")
 					(unit 1)
@@ -10998,7 +11781,7 @@
 			(uuid "fe4363c3-2701-4fd5-85ad-9fb3c7a93f6c")
 		)
 		(instances
-			(project ""
+			(project "temper"
 				(path "/ad9b79b0-4738-4cc8-a254-afb39ba62b16"
 					(reference "R3")
 					(unit 1)
