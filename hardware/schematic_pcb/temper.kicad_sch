@@ -4919,7 +4919,7 @@
 		)
 		(uuid "2fcd1d9c-9c7b-4abe-9373-dc8fc1d589cc")
 	)
-	(text "Parts not fitted by JCLPCB\n- U1\n- U2\n- C2\n- J1\n- J2\n- J3\n- J4\n- J5\n- J6\n- J7\n- Battery holder and battery\n"
+	(text "Parts not fitted by JCLPCB\n- D5\n- U1\n- U2\n\nOptional parts\n- C2\n- J1\n- J2\n- J3\n- J4\n- J5\n- J6\n- J7\n- Battery holder and battery\n"
 		(exclude_from_sim no)
 		(at 115.316 40.386 0)
 		(effects
