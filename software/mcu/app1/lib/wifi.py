@@ -170,6 +170,16 @@ class WiFi(object):
         """@return the mac address of the WiFi interface as an array of 6 bytes."""
         return self._wlan.config('mac')
 
+    def get_rssi(self):
+        """@return The RSSI of the connected WiFi network or None if not connected."""
+        rssi = None
+        if self._wlan.isconnected():
+            ssid = self._wlan.config('essid')
+            for net in self._wlan.scan():
+                if net[0].decode('utf-8') == ssid:
+                    rssi = net[3]
+        return rssi
+
     def is_factory_reset_required(self):
         """@brief Check if the user has held town the button for long enough to reset the configuration to factory defaults.
            @return True if the button has been held down by the user for the required amount of time."""
@@ -202,7 +212,7 @@ class WiFi(object):
         led_flash_time = time() + 2
         while True:
             wifi_status = self._wlan.status()
-            self._uo.debug("wifi_status={}".format(wifi_status))
+            self.debug("wifi_status={}".format(wifi_status))
             if self._wlan.isconnected():
                 break
 
@@ -227,7 +237,7 @@ class WiFi(object):
             else:
                 self._wifi_led.value(False)
 
-        self._uo.debug('connected')
+        self.debug('connected')
         status = self._wlan.ifconfig()
         self._ip_address = status[0]
         self.info('IP Address=' + self._ip_address)
