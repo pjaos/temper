@@ -477,11 +477,6 @@ class TemperDB(object):
         return [dict(row) for row in rows]
 
 
-
-
-
-
-
 def main():
     """@brief Program entry point"""
     uio = UIO()
