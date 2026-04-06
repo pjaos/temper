@@ -10,6 +10,7 @@ import rich
 import sqlite3
 import traceback
 
+from datetime import datetime, timezone
 from threading import Thread
 from time import time, sleep
 from pathlib import Path
@@ -198,7 +199,9 @@ class AreYouThereThread(Thread):
                 ipList = ifDict[ifName]
                 AreYouThereThread.UpdateMultiCastAddressList(subNetMultiCastAddressList, ipList)
 
-            sleep(0.1)
+            if len(subNetMultiCastAddressList) == 0:
+                # Avoid spinning at 100% CPU while waiting for a network interface
+                sleep(1)
 
         return tuple(subNetMultiCastAddressList)
 
@@ -258,6 +261,9 @@ class TemperDB(object):
         self._uio = uio
         self._options = options
         self._db_file = TemperDB.GetDBFile()
+        # Create tables once at startup rather than on every save call
+        with self.get_connection() as conn:
+            self.create_tables(conn)
 
     def reap(self):
         """@brief Send messages to temper hardware. Retrieve data from them and save it to a local sqlite db."""
@@ -294,15 +300,14 @@ class TemperDB(object):
             self._uio.debug(f"Updated {self._db_file}")
 
         except Exception:
-            lines = traceback.format_exc().split("\n")
-            for line in lines:
-                self._uio.debug(line)
+            # Always log save failures, not just in debug mode
+            self._uio.error(f"Failed to save sensor data: {traceback.format_exc()}")
 
     def get_connection(self, db_path: str = "") -> sqlite3.Connection:
         if not db_path:
-            db_path = TemperDB.GetDBFile()
+            db_path = self._db_file
 
-        conn = sqlite3.connect(db_path, timeout=30)
+        conn = sqlite3.connect(db_path, timeout=20)
         conn.row_factory = sqlite3.Row
 
         # Recommended for reliability with concurrent writers
@@ -331,7 +336,7 @@ class TemperDB(object):
             CREATE TABLE IF NOT EXISTS sensor_readings (
                 id                      INTEGER PRIMARY KEY AUTOINCREMENT,
                 unit_id                 INTEGER NOT NULL REFERENCES units(id),
-                recorded_at             TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                recorded_at             TIMESTAMP DEFAULT CURRENT_TIMESTAMP,  -- UTC
                 uptime_seconds          INTEGER,
                 rx_time_secs            REAL,
                 ram_free_bytes          INTEGER,
@@ -359,6 +364,10 @@ class TemperDB(object):
         conn.execute("""
             CREATE INDEX IF NOT EXISTS idx_readings_unit_id
             ON sensor_readings(unit_id)
+        """)
+        conn.execute("""
+            CREATE INDEX IF NOT EXISTS idx_readings_recorded_at
+            ON sensor_readings(recorded_at)
         """)
         conn.commit()
 
@@ -440,34 +449,41 @@ class TemperDB(object):
 
     def save_sensor_json(self, json_data: str | dict, db_path: str = "") -> int:
         """Main entry point. Pass either a JSON string or an already-parsed dict."""
-        if not db_path:
-            db_path = TemperDB.GetDBFile()
         data = json.loads(json_data) if isinstance(json_data, str) else json_data
         with self.get_connection(db_path) as conn:
-            self.create_tables(conn)
             unit_id = self.upsert_unit(conn, data)
             row_id = self.insert_reading(conn, unit_id, data)
             conn.commit()
         return row_id
 
-    def get_readings_for_unit(self, unit_name: str, db_path: str = "") -> list[dict]:
-        """Fetch all readings for a given unit name, newest first."""
-        if not db_path:
-            db_path = TemperDB.GetDBFile()
+    def get_readings_for_unit(self,
+                              unit_name: str,
+                              db_path: str = "",
+                              limit: int = 1000,
+                              since: datetime | None = None) -> list[dict]:
+        """Fetch readings for a given unit name, newest first.
+        @param unit_name  The UNIT_NAME to query.
+        @param db_path    Override the default database path.
+        @param limit      Maximum number of rows to return (default 1000).
+        @param since      If given, only return readings at or after this UTC datetime."""
+        query = """
+            SELECT r.*, u.unit_name, u.ip_address
+            FROM sensor_readings r
+            JOIN units u ON u.id = r.unit_id
+            WHERE u.unit_name = ?
+        """
+        params: list = [unit_name]
+        if since is not None:
+            query += " AND r.recorded_at >= ?"
+            params.append(since.strftime("%Y-%m-%d %H:%M:%S"))
+        query += " ORDER BY r.recorded_at DESC LIMIT ?"
+        params.append(limit)
         with self.get_connection(db_path) as conn:
-            rows = conn.execute("""
-                SELECT r.*, u.unit_name, u.ip_address
-                FROM sensor_readings r
-                JOIN units u ON u.id = r.unit_id
-                WHERE u.unit_name = ?
-                ORDER BY r.recorded_at DESC
-            """, (unit_name,)).fetchall()
+            rows = conn.execute(query, params).fetchall()
         return [dict(row) for row in rows]
 
     def get_all_units(self, db_path: str = "") -> list[dict]:
         """Return a summary of all known units."""
-        if not db_path:
-            db_path = TemperDB.GetDBFile()
         with self.get_connection(db_path) as conn:
             rows = conn.execute("""
                 SELECT u.*, COUNT(r.id) as reading_count
@@ -477,6 +493,34 @@ class TemperDB(object):
                 ORDER BY u.unit_name
             """).fetchall()
         return [dict(row) for row in rows]
+
+
+    def get_latest_reading_per_unit(self, db_path: str = "") -> list[dict]:
+        """Return the most recent reading for every known unit. Useful for a status dashboard."""
+        with self.get_connection(db_path) as conn:
+            rows = conn.execute("""
+                SELECT r.*, u.unit_name, u.ip_address
+                FROM sensor_readings r
+                JOIN units u ON u.id = r.unit_id
+                WHERE r.id IN (
+                    SELECT MAX(id) FROM sensor_readings GROUP BY unit_id
+                )
+                ORDER BY u.unit_name
+            """).fetchall()
+        return [dict(row) for row in rows]
+
+    def prune_readings_older_than(self, days: int, db_path: str = "") -> int:
+        """Delete readings older than the given number of days.
+        @param days    Readings strictly older than this many days are removed.
+        @return        The number of rows deleted."""
+        cutoff = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S")
+        with self.get_connection(db_path) as conn:
+            cursor = conn.execute("""
+                DELETE FROM sensor_readings
+                WHERE recorded_at < datetime(?, '-' || ? || ' days')
+            """, (cutoff, days))
+            conn.commit()
+        return cursor.rowcount
 
 
 def main():
