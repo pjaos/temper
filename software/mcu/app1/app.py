@@ -26,9 +26,9 @@ class ThisMachineConfig(MachineConfig):
     DEFAULT_CONFIG = {YDev.ACTIVE: True,
                       YDev.AYT_TCP_PORT_KEY: 2934,               # The UDP port we expect to receive an AYT UDP broadcast message
                       YDev.OS_KEY: "MicroPython",
-                      YDev.UNIT_NAME_KEY: "DEV_NAME",            # This can be used to identify device, probably user configurable.
-                      YDev.PRODUCT_ID_KEY: "PRODUCT_ID",         # This is fixed for the product, probably during MFG.
-                      YDev.DEVICE_TYPE_KEY: "DEV_TYPE",          # This is fixed for the product, probably during MFG.
+                      YDev.UNIT_NAME_KEY: "TEMPER_DEV",          # This can be used to identify device, probably user configurable.
+                      YDev.PRODUCT_ID_KEY: "TEMPER",             # This is fixed for the product, probably during MFG.
+                      YDev.DEVICE_TYPE_KEY: "SENSOR",            # This is fixed for the product, probably during MFG.
                       YDev.SERVICE_LIST_KEY: "web:80",           # A service name followed by the TCPIP port number this device presents the service on.
                       YDev.GROUP_NAME_KEY: ""                    # Used put devices in a group for mild isolation purposes.
                       }
@@ -68,7 +68,7 @@ async def start(runningAppKey, configFilename):
 class ThisMachine(BaseMachine):
     """@brief Implement functionality required by this project."""
 
-    ADC_CODES_TO_MV             = 19757.69  # Arrived at empirically by measuring the ADC voltage @ 24C
+    ADC_CODES_TO_MV             = 14508  # Arrived at empirically by measuring the ADC voltage @ 25C
     MCP9700_VOUT_0C             = 0.5
     MCP9700_TC                  = 0.01
 
@@ -83,6 +83,7 @@ class ThisMachine(BaseMachine):
     PARAM_SENSOR_3_HUMIDITY = "PARAM_SENSOR_3_HUMIDITY"
     PARAM_SENSOR_4_TEMP = "PARAM_SENSOR_4_TEMP"
     PARAM_SENSOR_4_HUMIDITY = "PARAM_SENSOR_4_HUMIDITY"
+    PARAM_RSSI = "PARAM_RSSI"
 
     def __init__(self, uo, machine_config):
         super().__init__(uo, machine_config)
@@ -119,24 +120,18 @@ class ThisMachine(BaseMachine):
 
         # Call the app task to execute your projects functionality.
         asyncio.create_task(self.app_task())
-#        asyncio.create_task(self.app_task_pico())
 
         self._web_server.run()
 
     async def app_task(self):
         """@brief Add your project code here.
                   Make sure await asyncio.sleep(1) is called frequently to ensure other tasks get CPU time."""
-        c=0
-        while True:
-            await asyncio.sleep(2)
-            c+=1
-            print(f"PJA: c={c}")
-
-    async def app_task_pico(self):
-        """@brief Add your project code here.
-                  Make sure await asyncio.sleep(1) is called frequently to ensure other tasks get CPU time."""
-        Pin(32, Pin.OUT, value=0)
+        # Set /TON low to apply power to the temp sensors
+        Pin(26, Pin.OUT, value=0)
+        # Apply power to the voltage rail detectors
         Pin(13, Pin.OUT, value=1)
+        # Disable power LED to save power
+        Pin(22, Pin.OUT, value=0)
 
         sensor1 = dht.DHT22(Pin(16, Pin.OUT, Pin.PULL_UP))
         sensor2 = dht.DHT22(Pin(17, Pin.OUT, Pin.PULL_UP))
@@ -144,29 +139,22 @@ class ThisMachine(BaseMachine):
         sensor4 = dht.DHT22(Pin(19, Pin.OUT, Pin.PULL_UP))
 
         # scaling factors for voltages
-        scale_vbat = 3801.7
-        scale_3v3 = 5027.6
+        scale_vbat = 2693
+        scale_3v3 = 5144
 
         adc_vbat = ADC(Pin(34, Pin.IN))
         adc_3v3 = ADC(Pin(35, Pin.IN))
-        adc_mcp9700 = ADC(Pin(25, Pin.IN))
+        adc_mcp9700 = ADC(Pin(33, Pin.IN))
 
-        paramDict = {ThisMachine.PARAM_3V3: "",
-                     ThisMachine.PARAM_VBAT: "",
-                     ThisMachine.PARAM_BOARD_TEMP: "",
-                     ThisMachine.PARAM_SENSOR_1_TEMP: "",
-                     ThisMachine.PARAM_SENSOR_1_HUMIDITY: "",
-                     ThisMachine.PARAM_SENSOR_2_TEMP: "",
-                     ThisMachine.PARAM_SENSOR_2_HUMIDITY: "",
-                     ThisMachine.PARAM_SENSOR_3_TEMP: "",
-                     ThisMachine.PARAM_SENSOR_3_HUMIDITY: "",
-                     ThisMachine.PARAM_SENSOR_4_TEMP: "",
-                     ThisMachine.PARAM_SENSOR_4_HUMIDITY: ""}
+        paramDict = {}
 
         self._web_server.setParamDict(paramDict)
 
         while True:
             try:
+                rssi = self._wifi.get_rssi()
+                paramDict[ThisMachine.PARAM_RSSI] = f"{rssi:.1f}"
+
                 value_3v3 = adc_3v3.read_u16()
                 voltage_3v3 = value_3v3 / scale_3v3
                 paramDict[ThisMachine.PARAM_3V3] = f"{voltage_3v3:.3f}"
@@ -175,32 +163,26 @@ class ThisMachine(BaseMachine):
                 voltage_vbat = value_vbat / scale_vbat
                 paramDict[ThisMachine.PARAM_VBAT] = f"{voltage_vbat:.3f}"
 
+                self._web_server.addSysStats(paramDict)
+
                 adc_value = adc_mcp9700.read_u16()
-                #volts = adc_value/ThisMachine.ADC_CODES_TO_MV
-                # board_temp_c = ( volts - ThisMachine.MCP9700_VOUT_0C ) / ThisMachine.MCP9700_TC
-                # PJA paramDict[ThisMachine.PARAM_BOARD_TEMP] = f"{board_temp_c:.1f}"
-                paramDict[ThisMachine.PARAM_BOARD_TEMP] = f"{adc_value}"
+                volts = adc_value/ThisMachine.ADC_CODES_TO_MV
+                board_temp_c = ( volts - ThisMachine.MCP9700_VOUT_0C ) / ThisMachine.MCP9700_TC
+                paramDict[ThisMachine.PARAM_BOARD_TEMP] = f"{board_temp_c:.1f}"
 
-                sensor1.measure()
-                await asyncio.sleep(.1)
-                sensor2.measure()
-                await asyncio.sleep(.1)
-                sensor3.measure()
-                await asyncio.sleep(.1)
-                sensor4.measure()
-
-                paramDict[ThisMachine.PARAM_SENSOR_1_TEMP] = sensor1.temperature()
-                paramDict[ThisMachine.PARAM_SENSOR_1_HUMIDITY] = sensor1.humidity()
-
-                paramDict[ThisMachine.PARAM_SENSOR_2_TEMP] = sensor2.temperature()
-                paramDict[ThisMachine.PARAM_SENSOR_2_HUMIDITY] = sensor2.humidity()
-
-                paramDict[ThisMachine.PARAM_SENSOR_3_TEMP] = sensor3.temperature()
-                paramDict[ThisMachine.PARAM_SENSOR_3_HUMIDITY] = sensor3.humidity()
-
-                paramDict[ThisMachine.PARAM_SENSOR_4_TEMP] = sensor4.temperature()
-                paramDict[ThisMachine.PARAM_SENSOR_4_HUMIDITY] = sensor4.humidity()
-                print(f"PJA: paramDict={paramDict}")
+                # Read each sensor. If not connected ignore error and read the next
+                param_list = [[sensor1, ThisMachine.PARAM_SENSOR_1_TEMP, ThisMachine.PARAM_SENSOR_1_HUMIDITY, 1],
+                              [sensor2, ThisMachine.PARAM_SENSOR_2_TEMP, ThisMachine.PARAM_SENSOR_2_HUMIDITY, 2],
+                              [sensor3, ThisMachine.PARAM_SENSOR_3_TEMP, ThisMachine.PARAM_SENSOR_3_HUMIDITY, 3],
+                              [sensor4, ThisMachine.PARAM_SENSOR_4_TEMP, ThisMachine.PARAM_SENSOR_4_HUMIDITY, 4]]
+                for sensor, temp_key, humidity_key, sensor_number in param_list:
+                    try:
+                        sensor.measure()
+                        await asyncio.sleep(.1)
+                        paramDict[temp_key] = sensor.temperature()
+                        paramDict[humidity_key] = sensor.humidity()
+                    except Exception:
+                        self.error(f"Failed to read sensor {sensor_number}")
 
                 self._ydev.update_json_dict(paramDict)
 
