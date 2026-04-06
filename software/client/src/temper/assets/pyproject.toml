@@ -18,6 +18,8 @@ pytest = "*"
 nicegui = "^3.9.0"
 p3lib = "^1.1.155"
 pillow = "*"
+psutil = "*"
+rich = "*"
 
 [tool.poetry.scripts]
 temper_db = "temper.temper_db:main"

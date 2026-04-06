@@ -725,7 +725,7 @@ class TapoCarCharge(Installer):
     #     from the pyproject.toml [tool.poetry.scripts] is used.
     # 1 = If True then a launcher icon is created.
     CMD_DICT = {
-        "temper": ("temper.temper", True),
+        "temper_db": ("temper.temper_db", False),
     }
 
 
