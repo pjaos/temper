@@ -198,6 +198,8 @@ class AreYouThereThread(Thread):
                 ipList = ifDict[ifName]
                 AreYouThereThread.UpdateMultiCastAddressList(subNetMultiCastAddressList, ipList)
 
+            sleep(0.1)
+
         return tuple(subNetMultiCastAddressList)
 
     def run(self):
@@ -300,7 +302,7 @@ class TemperDB(object):
         if not db_path:
             db_path = TemperDB.GetDBFile()
 
-        conn = sqlite3.connect(db_path, timeout=2)
+        conn = sqlite3.connect(db_path, timeout=30)
         conn.row_factory = sqlite3.Row
 
         # Recommended for reliability with concurrent writers
