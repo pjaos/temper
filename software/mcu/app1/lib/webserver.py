@@ -23,6 +23,8 @@ class WebServer():
     DISK_TOTAL_BYTES = const("DISK_TOTAL_BYTES")
     DISK_USED_BYTES = const("DISK_USED_BYTES")
     DISK_PERCENTAGE_USED = const("DISK_PERCENTAGE_USED")
+    DISK_FREE_BYTES = const("DISK_FREE_BYTES")
+    RAM_PERCENTAGE_USED = const("RAM_PERCENTAGE_USED")
 
     OK_KEY = "OK"                                            # The key in the JSON response if no error occurs.
     ERROR_KEY = "ERROR"                                      # The key in the JSON response if an error occurs.
@@ -88,6 +90,11 @@ class WebServer():
         responseDict[WebServer.RAM_USED_BYTES] = usedBytes
         responseDict[WebServer.RAM_FREE_BYTES] = freeBytes
         responseDict[WebServer.RAM_TOTAL_BYTES] = usedBytes + freeBytes
+        if freeBytes <= 0.0:
+            percentageUsed = 100.0
+        elif usedBytes > 0:
+            percentageUsed = (freeBytes / (usedBytes + freeBytes) ) * 100.0
+        responseDict[WebServer.RAM_PERCENTAGE_USED] = int(percentageUsed)
 
     def _addDiskUsageStats(self, responseDict):
         """@brief Update the RAM usage stats.
@@ -95,7 +102,8 @@ class WebServer():
         totalBytes, usedSpace, percentageUsed = VFS.GetFSInfo()
         responseDict[WebServer.DISK_TOTAL_BYTES] = totalBytes
         responseDict[WebServer.DISK_USED_BYTES] = usedSpace
-        responseDict[WebServer.DISK_PERCENTAGE_USED] = percentageUsed
+        responseDict[WebServer.DISK_FREE_BYTES] = totalBytes - usedSpace
+        responseDict[WebServer.DISK_PERCENTAGE_USED] = int(percentageUsed)
 
     def _addUpTime(self, responseDict):
         """@brief Get the uptime stats.
@@ -108,10 +116,15 @@ class WebServer():
         if runGC:
             gc.collect()
         responseDict = {}
+        self.addSysStats(responseDict)
+        return responseDict
+
+    def addSysStats(self, responseDict):
+        """@brief Add the system stats to the dict.
+           @param responseDict The dict to add the stats to."""
         self._addRamStats(responseDict)
         self._addDiskUsageStats(responseDict)
         self._addUpTime(responseDict)
-        return responseDict
 
     def _getFolderEntries(self, folder, fileList):
         """@brief List the entries in a folder.
@@ -322,7 +335,7 @@ class WebServer():
         """@brief Perform a device restart."""
         self._uo.info("PowerCycling now.")
         sleep(0.25)
-        machine.Pin(33, machine.Pin.OUT, value=1)
+        machine.Pin(25, machine.Pin.OUT, value=1)
 
     def resetToDefaultConfig(self):
         """@reset the configuration to defaults."""
