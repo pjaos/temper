@@ -241,3 +241,12 @@ temper/software/client/
 ## Licence
 
 See `LICENSE` in the repository root.
+
+## Author
+
+Paul Austen — [pjaos@gmail.com](mailto:pjaos@gmail.com)
+
+## Acknowledgements
+
+Development of this project was assisted by [Claude](https://claude.ai) (Anthropic's AI assistant),
+which contributed to code review, bug identification, test generation, and this documentation.
