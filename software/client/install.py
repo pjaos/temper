@@ -709,7 +709,7 @@ exec "{entrypoint}" "$@"
 
 # The Installer class must be extended to be used.
 # The APP_NAME and CMD_DICT attributes must be set.
-class TapoCarCharge(Installer):
+class Temper(Installer):
     # All sections mentioned below must be present in the projects pyproject.toml file.
 
     # APP_NAME
@@ -725,13 +725,15 @@ class TapoCarCharge(Installer):
     #     from the pyproject.toml [tool.poetry.scripts] is used.
     # 1 = If True then a launcher icon is created.
     CMD_DICT = {
-        "temper_db": ("temper.temper_db", False),
+        "temper_db": ("", False),
+        "temper_gui": ("temper.temper_gui", True),
     }
 
+#        "temper_gui": ("temper.temper_gui", True),
 
 def main():
     # All that is needed is for the extended class to be instantiated.
-    TapoCarCharge()
+    Temper()
 
 
 if __name__ == "__main__":

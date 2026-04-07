@@ -1,2 +1,9 @@
 src/temper/__pycache__/
-linux/temper*.tar.gz
+tests/__pycache__/
+linux/*.tar.gz
+linux/temper-0.1.0.tar.gz
+.pytest_cache/
+./.ropeproject
+create_gui.md
+# Do not add src/temper/assets/pyproject.toml to this file
+# or poetry will fail to include this file in the build.
