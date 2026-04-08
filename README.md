@@ -19,7 +19,13 @@ The two programs are independent. `temper_db` can run continuously as a backgrou
 
 Temper is designed to work with TEMPER-branded sensor units that broadcast JSON payloads over UDP on the local network. Each unit reports up to four independent temperature/humidity sensor channels, along with system telemetry (RAM, disk, uptime, RSSI, battery voltage, etc.).
 
-The collector listens on **UDP port 2934** and sends periodic *Are You There* broadcast messages to discover units automatically. No manual IP configuration is required unless you want to filter to a specific unit.
+![alt text](./images/box_with_pcb.jpg)
+
+![alt text](./images/temper_hardware.jpg)
+
+Details of the hardware including kicad schematic, PCB and BOM can be found in the hardware folder.
+
+This hardware runs a micropython program which can be found in software/mcu folder. It listens on **UDP port 2934** and responds to *Are You There* broadcast messages with the status (temperature/humidity etc).
 
 ---
 
@@ -48,7 +54,7 @@ This creates a virtual environment, installs all dependencies, and adds the `tem
 
 ### Collector — `temper_db`
 
-Discovers TEMPER units on the local LAN and writes every received reading to the database.
+Discovers TEMPER hardware units on the local LAN and writes every received reading to the database.
 
 ```bash
 python -m temper.temper_db [options]
