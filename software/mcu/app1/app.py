@@ -177,7 +177,9 @@ class ThisMachine(BaseMachine):
                               [sensor4, ThisMachine.PARAM_SENSOR_4_TEMP, ThisMachine.PARAM_SENSOR_4_HUMIDITY, 4]]
                 for sensor, temp_key, humidity_key, sensor_number in param_list:
                     try:
+                        self.pat_wdt()
                         sensor.measure()
+                        self.pat_wdt()
                         await asyncio.sleep(.1)
                         paramDict[temp_key] = sensor.temperature()
                         paramDict[humidity_key] = sensor.humidity()
