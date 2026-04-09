@@ -139,4 +139,4 @@ class BaseMachine(UOBase):
             # Reset the WDT if it has been set.
             self.pat_wdt()
             # Allow other tasks plenty of time to run.
-            await asyncio.sleep(1)
+            await asyncio.sleep(0.1)
