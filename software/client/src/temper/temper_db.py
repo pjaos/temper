@@ -533,7 +533,7 @@ def main():
                                          formatter_class=argparse.RawDescriptionHelpFormatter)
         parser.add_argument("-d", "--debug",   action='store_true', help="Enable debugging.")
         parser.add_argument("-a", "--address", help="Enter the IP address of the temper unit to record data from. If not set then data is recorded from all temper units found.", default=None)
-        parser.add_argument("-s", "--seconds",  type=int, help="The sensor poll time in seconds (default = 10).", default=10)
+        parser.add_argument("-s", "--seconds",  type=int, help="The sensor poll time in seconds (default = 60).", default=60)
 
         # Add args for auto boot cmd
         BootManager.AddCmdArgs(parser)
