@@ -13,6 +13,7 @@ from lib.io import IO
 from lib.hardware import const
 from lib.fs import VFS
 from lib.wifi import WiFi
+from lib.ydev import YDev
 
 class WebServer():
     DEFAULT_PORT = 80
@@ -442,6 +443,20 @@ class WebServer():
 
         return responseDict
 
+    def _set_name(self, request):
+        """@brief Set the name of the unit.
+           @param request The http request.
+           @return The response dict."""
+        name = request.args.get("name", None)
+        if name:
+            self._machine_config.set(YDev.UNIT_NAME_KEY, name)
+            print(f"PJA: SET name={name}")
+            responseDict = WebServer.GetOKDict()
+
+        else:
+            responseDict = WebServer.GetErrorDict("No name passed to /set_name")
+        return responseDict
+
     def run(self):
         """@brief This is a blocking method that starts the web server."""
 
@@ -504,6 +519,10 @@ class WebServer():
         @app.route('/rmdir')
         async def rmdir(request):
             return get_json(self._rmDir(request))
+
+        @app.route('/set_name')
+        async def set_name(request):
+            return get_json(self._set_name(request))
 
         @app.route('/rmfile')
         async def rmfile(request):

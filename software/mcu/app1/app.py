@@ -1,5 +1,4 @@
-# from machine import WDT
-
+import sys
 import asyncio
 from time import time
 
@@ -84,6 +83,7 @@ class ThisMachine(BaseMachine):
     PARAM_SENSOR_4_TEMP = "PARAM_SENSOR_4_TEMP"
     PARAM_SENSOR_4_HUMIDITY = "PARAM_SENSOR_4_HUMIDITY"
     PARAM_RSSI = "PARAM_RSSI"
+    EXCEPTION_TEXT = "EXCEPTION_TEXT"
 
     def __init__(self, uo, machine_config):
         super().__init__(uo, machine_config)
@@ -95,6 +95,11 @@ class ThisMachine(BaseMachine):
         # drop out to the REPL prompt.
         # The WDT will then trigger a reboot.
         # self._wdt = WDT(timeout=WDT_TIMEOUT_MSECS)
+
+        # Ensure the device name is present in the machine config
+        # This is the same value that used to be hard coded.
+        if not self._machine_config.is_parameter(YDev.UNIT_NAME_KEY):
+            self._machine_config.set(YDev.UNIT_NAME_KEY, "TEMPER_DEV")
 
     def start(self):
         self.show_ram_info()
@@ -112,7 +117,6 @@ class ThisMachine(BaseMachine):
 
         # Run the web server. This is used for upgrades and also to present
         # a local webserver to allow users to interact with the device.
-        # In this case it displays dummy temperatures.
         from lib.webserver import WebServer
         self._web_server = WebServer(self._machine_config,
                                self._startTime,
@@ -126,6 +130,9 @@ class ThisMachine(BaseMachine):
     async def app_task(self):
         """@brief Add your project code here.
                   Make sure await asyncio.sleep(1) is called frequently to ensure other tasks get CPU time."""
+        # Set /TON high to remove power to the temp sensors
+        Pin(26, Pin.OUT, value=0)
+        await asyncio.sleep(1)
         # Set /TON low to apply power to the temp sensors
         Pin(26, Pin.OUT, value=0)
         # Apply power to the voltage rail detectors
@@ -138,7 +145,7 @@ class ThisMachine(BaseMachine):
         sensor3 = dht.DHT22(Pin(18, Pin.OUT, Pin.PULL_UP))
         sensor4 = dht.DHT22(Pin(19, Pin.OUT, Pin.PULL_UP))
 
-        # scaling factors for voltages
+        # scaling factors for voltages, empirically evaluated.
         scale_vbat = 2693
         scale_3v3 = 5144
 
@@ -147,6 +154,7 @@ class ThisMachine(BaseMachine):
         adc_mcp9700 = ADC(Pin(33, Pin.IN))
 
         paramDict = {}
+        paramDict[ThisMachine.EXCEPTION_TEXT] = ""
 
         self._web_server.setParamDict(paramDict)
 
@@ -179,12 +187,14 @@ class ThisMachine(BaseMachine):
                     try:
                         self.pat_wdt()
                         sensor.measure()
-                        self.pat_wdt()
-                        await asyncio.sleep(.1)
                         paramDict[temp_key] = sensor.temperature()
                         paramDict[humidity_key] = sensor.humidity()
-                    except Exception:
-                        self.error(f"Failed to read sensor {sensor_number}")
+                    except Exception as exc:
+                        from io import StringIO      # on some ports use uio.StringIO
+                        buf = StringIO()
+                        sys.print_exception(exc, buf)
+                        stack_str = buf.getvalue()
+                        paramDict[ThisMachine.EXCEPTION_TEXT] = f"Sensor {sensor_number} ERROR: {stack_str}"
 
                 self._ydev.update_json_dict(paramDict)
 
