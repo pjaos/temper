@@ -726,6 +726,7 @@ class Temper(Installer):
     # 1 = If True then a launcher icon is created.
     CMD_DICT = {
         "temper_db": ("", False),
+        "temper_set_name": ("", False),
         "temper_gui": ("temper.temper_gui", True),
     }
 

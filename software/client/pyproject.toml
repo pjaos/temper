@@ -1,6 +1,6 @@
 [project]
 name = "temper"
-version = "0.2.2"
+version = "0.2.3"
 description = "An app to allow temperature and humidity data from temper hardware to be saved to a database and displayed."
 authors = [
     {name = "Paul Austen",email = "pjaos@gmail.com"}
@@ -23,6 +23,7 @@ rich = "*"
 
 [tool.poetry.scripts]
 temper_db = "temper.temper_db:main"
+temper_set_name = "temper.temper_set_name:main"
 temper_gui = "temper.temper_gui:main"
 
 [tool.pytest.ini_options]
