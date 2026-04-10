@@ -509,6 +509,27 @@ class TemperDB(object):
             """).fetchall()
         return [dict(row) for row in rows]
 
+    def delete_unit(self, unit_name: str, db_path: str = "") -> int:
+        """Delete a unit and all its readings from the database.
+        @param unit_name  The UNIT_NAME of the device to remove.
+        @return           The number of sensor_readings rows deleted.
+        @raises           ValueError if the unit_name is not found.
+        """
+        with self.get_connection(db_path) as conn:
+            row = conn.execute(
+                "SELECT id FROM units WHERE unit_name = ?", (unit_name,)
+            ).fetchone()
+            if row is None:
+                raise ValueError(f"Unit '{unit_name}' not found in database")
+            unit_id = row["id"]
+            cursor = conn.execute(
+                "DELETE FROM sensor_readings WHERE unit_id = ?", (unit_id,)
+            )
+            readings_deleted = cursor.rowcount
+            conn.execute("DELETE FROM units WHERE id = ?", (unit_id,))
+            conn.commit()
+        return readings_deleted
+
     def prune_readings_older_than(self, days: int, db_path: str = "") -> int:
         """Delete readings older than the given number of days.
         @param days    Readings strictly older than this many days are removed.
@@ -533,7 +554,7 @@ def main():
                                          formatter_class=argparse.RawDescriptionHelpFormatter)
         parser.add_argument("-d", "--debug",   action='store_true', help="Enable debugging.")
         parser.add_argument("-a", "--address", help="Enter the IP address of the temper unit to record data from. If not set then data is recorded from all temper units found.", default=None)
-        parser.add_argument("-s", "--seconds",  type=int, help="The sensor poll time in seconds (default = 60).", default=60)
+        parser.add_argument("-s", "--seconds",  type=int, help="The sensor poll time in seconds (default = 10).", default=10)
 
         # Add args for auto boot cmd
         BootManager.AddCmdArgs(parser)

@@ -24,6 +24,7 @@ MSG_UNITS_LOADED    = "units_loaded"
 MSG_READINGS_LOADED = "readings_loaded"
 MSG_ERROR           = "error"
 MSG_STATUS          = "status"
+MSG_UNIT_DELETED    = "unit_deleted"
 
 
 # ---------------------------------------------------------------------------
@@ -99,6 +100,22 @@ def _worker_load_readings(
     except Exception as exc:
         gui_queue.put({"type": MSG_ERROR, "text": f"Failed to load readings: {exc}"})
 
+
+def _worker_delete_unit(
+    db: TemperDB,
+    gui_queue: queue.Queue,
+    unit_name: str,
+) -> None:
+    try:
+        gui_queue.put({"type": MSG_STATUS, "text": f"Deleting {unit_name}…"})
+        readings_deleted = db.delete_unit(unit_name)
+        gui_queue.put({
+            "type":             MSG_UNIT_DELETED,
+            "unit":             unit_name,
+            "readings_deleted": readings_deleted,
+        })
+    except Exception as exc:
+        gui_queue.put({"type": MSG_ERROR, "text": f"Failed to delete unit: {exc}"})
 
 # ---------------------------------------------------------------------------
 # CSS / theme
@@ -341,6 +358,31 @@ body, .nicegui-content {
 .nicegui-plot { width: 100% !important; }
 .q-date, .q-date__header { background: var(--surface2) !important; color: var(--text) !important; }
 
+.delete-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 20px; height: 20px;
+    border-radius: 50%;
+    border: 1px solid transparent;
+    background: transparent;
+    color: var(--text-muted);
+    font-size: 0.7rem;
+    cursor: pointer;
+    transition: all 0.12s;
+    flex-shrink: 0;
+    line-height: 1;
+    padding: 0;
+    margin-left: 2px;
+}
+.delete-btn:hover { border-color: var(--red); color: var(--red); background: rgba(248,81,73,0.12); }
+
+.unit-row {
+    display: inline-flex;
+    align-items: center;
+    margin: 2px;
+}
+
 @media (max-width: 700px) {
     .app-body    { flex-direction: column; }
     .sidebar     {
@@ -548,6 +590,11 @@ def index_page() -> None:
             daemon=True,
         ).start()
 
+    def launch_delete_unit(unit_name: str):
+        threading.Thread(
+            target=_worker_delete_unit, args=(db, gui_queue, unit_name), daemon=True
+        ).start()
+
     # ── GUI helpers ──────────────────────────────────────────────────────────
 
     def _set_loading(on: bool):
@@ -652,6 +699,20 @@ def index_page() -> None:
                 _render_stats(rows)
                 _render_chart(rows)
 
+            elif mtype == MSG_UNIT_DELETED:
+                unit  = msg["unit"]
+                count = msg["readings_deleted"]
+                # If the deleted unit was selected, clear the view
+                if state["selected_unit"] == unit:
+                    state["selected_unit"] = None
+                    state["rows"] = []
+                    _render_stats([])
+                    _render_chart([])
+                _show_error(None)
+                _update_status(f"Deleted {unit} ({count} reading(s) removed)")
+                # Reload the unit list so the chip disappears
+                launch_load_units()
+
             processed += 1
 
     # ── Interaction handlers ─────────────────────────────────────────────────
@@ -709,6 +770,35 @@ def index_page() -> None:
         _render_chart(state["rows"])
         _update_status("Sensor names saved")
 
+    def _on_delete_unit(unit_name: str):
+        """Show a confirmation dialog before deleting the unit and all its data."""
+        with ui.dialog() as dialog, ui.card().style(
+            "background:var(--surface);border:1px solid var(--border);"
+            "border-radius:var(--radius);padding:20px;min-width:280px;"
+        ):
+            ui.html(
+                f"<div style='font-family:Space Mono,monospace;font-size:0.8rem;"
+                f"color:var(--red);margin-bottom:8px;'>DELETE UNIT</div>"
+                f"<div style='font-size:0.9rem;color:var(--text);margin-bottom:4px;'>"
+                f"<strong>{unit_name}</strong></div>"
+                f"<div style='font-size:0.8rem;color:var(--text-muted);margin-bottom:16px;'>"
+                f"This will permanently remove the unit and all its sensor readings. "
+                f"This cannot be undone.</div>"
+            )
+            with ui.element("div").style("display:flex;gap:8px;justify-content:flex-end;"):
+                ui.button("Cancel", on_click=dialog.close).props("flat dense").style(
+                    "color:var(--text-muted);font-family:'Space Mono',monospace;"
+                    "font-size:0.72rem;"
+                )
+                def _confirm():
+                    dialog.close()
+                    launch_delete_unit(unit_name)
+                ui.button("Delete", on_click=_confirm).props("dense").style(
+                    "background:var(--red);color:#fff;border-radius:6px;"
+                    "font-family:'Space Mono',monospace;font-size:0.72rem;"
+                )
+        dialog.open()
+
     def _rebuild_unit_chips(units: list[dict]):
         container = refs.get("chip_container")
         if not container:
@@ -722,9 +812,15 @@ def index_page() -> None:
             for u in units:
                 name  = u["unit_name"]
                 count = u.get("reading_count", 0)
-                chip  = ui.label(f"{name} ({count})").classes("unit-chip")
-                chip.on("click", lambda n=name: _select_unit(n))
-                refs["unit_chips"][name] = chip
+                # Wrap chip + delete button together in a small row
+                with ui.element("div").classes("unit-row"):
+                    chip = ui.label(f"{name} ({count})").classes("unit-chip")
+                    chip.on("click", lambda n=name: _select_unit(n))
+                    refs["unit_chips"][name] = chip
+                    ui.html(
+                        "<span class='delete-btn' "
+                        f"title='Delete {name}'>✕</span>"
+                    ).on("click", lambda n=name: _on_delete_unit(n))
         _refresh_unit_chips()
 
     # ── Page HTML ────────────────────────────────────────────────────────────
