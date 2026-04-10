@@ -73,6 +73,14 @@ def _worker_load_units(db: TemperDB, gui_queue: queue.Queue) -> None:
     except Exception as exc:
         gui_queue.put({"type": MSG_ERROR, "text": f"Failed to load units: {exc}"})
 
+def _utc_str_to_local(ts: str) -> str:
+    if not ts:
+        return ts
+    try:
+        dt_utc = datetime.strptime(ts, "%Y-%m-%d %H:%M:%S").replace(tzinfo=timezone.utc)
+        return dt_utc.astimezone().strftime("%Y-%m-%d %H:%M:%S")
+    except ValueError:
+        return ts   # return unchanged if format is unexpected
 
 def _worker_load_readings(
     db: TemperDB,
@@ -85,6 +93,8 @@ def _worker_load_readings(
         gui_queue.put({"type": MSG_STATUS, "text": f"Loading data for {unit_name}…"})
         rows = db.get_readings_for_unit(unit_name, since=since, limit=limit)
         rows = list(reversed(rows))   # oldest → newest for charts
+        # Ensure we display the data in local time
+        rows = [{**r, "recorded_at": _utc_str_to_local(r["recorded_at"])} for r in rows]
         gui_queue.put({"type": MSG_READINGS_LOADED, "unit": unit_name, "rows": rows})
     except Exception as exc:
         gui_queue.put({"type": MSG_ERROR, "text": f"Failed to load readings: {exc}"})
