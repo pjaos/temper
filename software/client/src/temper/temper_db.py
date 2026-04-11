@@ -562,6 +562,7 @@ def main():
         options = parser.parse_args()
 
         uio.enableDebug(options.debug)
+        uio.enableSyslog(True)
 
         handled = BootManager.HandleOptions(uio, options, False)
         if not handled:
