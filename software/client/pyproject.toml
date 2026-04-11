@@ -1,6 +1,6 @@
 [project]
 name = "temper"
-version = "0.2.5"
+version = "0.2.6"
 description = "An app to allow temperature and humidity data from temper hardware to be saved to a database and displayed."
 authors = [
     {name = "Paul Austen",email = "pjaos@gmail.com"}
