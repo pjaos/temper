@@ -127,14 +127,17 @@ class ThisMachine(BaseMachine):
 
         self._web_server.run()
 
+    async def power_cycle_temp_sensors(self, delay=1.0):
+        # Set /TON high to remove power to the temp sensors
+        Pin(26, Pin.OUT, value=0)
+        await asyncio.sleep(delay)
+        # Set /TON low to apply power to the temp sensors
+        Pin(26, Pin.OUT, value=0)
+
     async def app_task(self):
         """@brief Add your project code here.
                   Make sure await asyncio.sleep(1) is called frequently to ensure other tasks get CPU time."""
-        # Set /TON high to remove power to the temp sensors
-        Pin(26, Pin.OUT, value=0)
-        await asyncio.sleep(1)
-        # Set /TON low to apply power to the temp sensors
-        Pin(26, Pin.OUT, value=0)
+        await self.power_cycle_temp_sensors()
         # Apply power to the voltage rail detectors
         Pin(13, Pin.OUT, value=1)
         # Disable power LED to save power
@@ -183,6 +186,7 @@ class ThisMachine(BaseMachine):
                               [sensor2, ThisMachine.PARAM_SENSOR_2_TEMP, ThisMachine.PARAM_SENSOR_2_HUMIDITY, 2],
                               [sensor3, ThisMachine.PARAM_SENSOR_3_TEMP, ThisMachine.PARAM_SENSOR_3_HUMIDITY, 3],
                               [sensor4, ThisMachine.PARAM_SENSOR_4_TEMP, ThisMachine.PARAM_SENSOR_4_HUMIDITY, 4]]
+
                 for sensor, temp_key, humidity_key, sensor_number in param_list:
                     try:
                         self.pat_wdt()
@@ -195,6 +199,10 @@ class ThisMachine(BaseMachine):
                         sys.print_exception(exc, buf)
                         stack_str = buf.getvalue()
                         paramDict[ThisMachine.EXCEPTION_TEXT] = f"Sensor {sensor_number} ERROR: {stack_str}"
+
+                        # As we had an issue reading a temperature sensor
+                        # try power cycling the temperature sensors to recover.
+                        await self.power_cycle_temp_sensors(delay=0.25)
 
                 self._ydev.update_json_dict(paramDict)
 
