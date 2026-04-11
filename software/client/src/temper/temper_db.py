@@ -27,7 +27,7 @@ class LocalYViewCollector(object):
         - Sending out AYT messages
         - Forwarding device data to listeners."""
 
-    UDP_SERVER_PORT = 2934
+    UDP_SERVER_PORT = 2939
     PRODUCT_ID      = "PRODUCT_ID"
     IP_ADDRESS      = "IP_ADDRESS"
     RX_TIME_SECS    = "RX_TIME_SECS"
@@ -128,8 +128,7 @@ class LocalYViewCollector(object):
 
 class AreYouThereThread(Thread):
     """Class to are you there messages to devices"""
-    #AreYouThereMessage = "{\"AYT\":\"-!#8[dkG^v's!dRznE}6}8sP9}QoIR#?O&pg)Qra\"}"
-    AreYouThereMessage = "{\"AYT\":\"TEMPER_DEV_AYT_MSG!#8[dkG^v's!dRznE}6}8sP9}QoIR#?O&pg)Qra\"}"
+    AreYouThereMessage = "{\"AYT\":\"-!#8[dkG^v's!dRznE}6}8sP9}QoIR#?O&pg)Qra\"}"
     PERIODICITY_SECONDS = 10.0
     MULTICAST_ADDRESS   = "255.255.255.255"
 
