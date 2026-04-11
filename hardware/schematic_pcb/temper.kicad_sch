@@ -5114,6 +5114,12 @@
 		(uuid "12c364ba-c097-4131-a260-1890e8c59c3f")
 	)
 	(junction
+		(at 50.8 125.73)
+		(diameter 0)
+		(color 0 0 0 0)
+		(uuid "155afa3f-515e-408f-8691-e6e127c53844")
+	)
+	(junction
 		(at 200.66 40.64)
 		(diameter 0)
 		(color 0 0 0 0)
@@ -5184,6 +5190,12 @@
 		(diameter 0)
 		(color 0 0 0 0)
 		(uuid "4ebcadbf-67dc-48c2-b9ea-4e06cce13652")
+	)
+	(junction
+		(at 50.8 182.88)
+		(diameter 0)
+		(color 0 0 0 0)
+		(uuid "51b61c4f-293d-4972-b896-e7874f7cbc0c")
 	)
 	(junction
 		(at 31.75 31.75)
@@ -5807,6 +5819,16 @@
 	)
 	(wire
 		(pts
+			(xy 50.8 125.73) (xy 50.8 134.62)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "2c5ddb49-1333-4c89-bf0e-810a7578d373")
+	)
+	(wire
+		(pts
 			(xy 219.71 97.79) (xy 218.44 97.79)
 		)
 		(stroke
@@ -5937,7 +5959,17 @@
 	)
 	(wire
 		(pts
-			(xy 54.61 182.88) (xy 49.53 182.88)
+			(xy 50.8 125.73) (xy 62.23 125.73)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "3d46570f-7046-488e-95f3-1de029db5660")
+	)
+	(wire
+		(pts
+			(xy 54.61 182.88) (xy 50.8 182.88)
 		)
 		(stroke
 			(width 0)
@@ -6727,7 +6759,7 @@
 	)
 	(wire
 		(pts
-			(xy 38.1 125.73) (xy 62.23 125.73)
+			(xy 38.1 125.73) (xy 50.8 125.73)
 		)
 		(stroke
 			(width 0)
@@ -7237,6 +7269,16 @@
 	)
 	(wire
 		(pts
+			(xy 50.8 142.24) (xy 50.8 182.88)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "edbb9a18-ad82-4167-b97f-d33dfc3555b5")
+	)
+	(wire
+		(pts
 			(xy 135.89 102.87) (xy 162.56 102.87)
 		)
 		(stroke
@@ -7284,6 +7326,16 @@
 			(type default)
 		)
 		(uuid "f5b8a5a6-6180-489a-9a1f-6dc7a5787c4b")
+	)
+	(wire
+		(pts
+			(xy 50.8 182.88) (xy 49.53 182.88)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "f66304ae-e28b-4790-8011-a8ec2a21ea53")
 	)
 	(wire
 		(pts
@@ -9043,6 +9095,76 @@
 		)
 	)
 	(symbol
+		(lib_id "Device:C_Polarized")
+		(at 50.8 138.43 0)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(uuid "43f14865-6a2c-4c80-aa3f-c8d88315a4b0")
+		(property "Reference" "C8"
+			(at 54.61 136.2709 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Value" "100uf 16v"
+			(at 54.61 138.8109 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Footprint" "Capacitor_THT:CP_Radial_D5.0mm_P2.50mm"
+			(at 51.7652 142.24 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" "~"
+			(at 50.8 138.43 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" "Polarized capacitor"
+			(at 50.8 138.43 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "4b86f748-2045-49d6-80da-f8737f578c19")
+		)
+		(pin "2"
+			(uuid "a226ae1e-6da6-4135-9664-c5ef2767a350")
+		)
+		(instances
+			(project "temper"
+				(path "/ad9b79b0-4738-4cc8-a254-afb39ba62b16"
+					(reference "C8")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
 		(lib_id "pja_1:2N7002")
 		(at 181.61 105.41 0)
 		(mirror y)
@@ -10187,7 +10309,7 @@
 				(justify left)
 			)
 		)
-		(property "Value" "DNF"
+		(property "Value" "220uf 25v"
 			(at 58.42 159.1309 0)
 			(effects
 				(font
