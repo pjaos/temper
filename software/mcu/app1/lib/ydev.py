@@ -14,7 +14,8 @@ class YDev(UOBase):
     AYT_KEY = "AYT"             # The key in the received JSON message.
     # The AYT key in the RX'ed JSON message must hold this value in
     # order to send a response to let the YView gateway know the device details.
-    ID_STRING = "TEMPER-!#8[dkG^v's!dRznE}6}8sP9}QoIR#?O&pg)Qra"
+    #ID_STRING = "TEMPER-!#8[dkG^v's!dRznE}6}8sP9}QoIR#?O&pg)Qra"
+    ID_STRING = "TEMPER_DEV_AYT_MSG!#8[dkG^v's!dRznE}6}8sP9}QoIR#?O&pg)Qra"
 
     # These are the attributes for the AYT response message
     IP_ADDRESS_KEY = "IP_ADDRESS"      # The IP address of this device

@@ -128,7 +128,8 @@ class LocalYViewCollector(object):
 
 class AreYouThereThread(Thread):
     """Class to are you there messages to devices"""
-    AreYouThereMessage = "{\"AYT\":\"TEMPER-!#8[dkG^v's!dRznE}6}8sP9}QoIR#?O&pg)Qra\"}"
+    #AreYouThereMessage = "{\"AYT\":\"-!#8[dkG^v's!dRznE}6}8sP9}QoIR#?O&pg)Qra\"}"
+    AreYouThereMessage = "{\"AYT\":\"TEMPER_DEV_AYT_MSG!#8[dkG^v's!dRznE}6}8sP9}QoIR#?O&pg)Qra\"}"
     PERIODICITY_SECONDS = 10.0
     MULTICAST_ADDRESS   = "255.255.255.255"
 
