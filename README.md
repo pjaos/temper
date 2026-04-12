@@ -108,6 +108,11 @@ temper_gui [options]
 | `--disable_auto_start` | Un-register the tool to start on system boot |
 | `--check_auto_start` | Check the running status |
 
+**Browser Example**
+
+![alt text](./images/temper_gui.png)
+
+
 **Example — start on a non-default port:**
 
 ```bash
