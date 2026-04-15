@@ -5126,6 +5126,12 @@
 		(uuid "1e45c065-3d44-4c19-b705-85f3f3d68ba7")
 	)
 	(junction
+		(at 62.23 125.73)
+		(diameter 0)
+		(color 0 0 0 0)
+		(uuid "203000b6-27f6-4cda-98b7-fdc306706554")
+	)
+	(junction
 		(at 204.47 158.75)
 		(diameter 0)
 		(color 0 0 0 0)
@@ -5160,6 +5166,12 @@
 		(diameter 0)
 		(color 0 0 0 0)
 		(uuid "2fa81b86-788f-45ec-a426-1c584b78c878")
+	)
+	(junction
+		(at 62.23 82.55)
+		(diameter 0)
+		(color 0 0 0 0)
+		(uuid "367c8a66-1101-4678-bced-d9a6aab4a315")
 	)
 	(junction
 		(at 135.89 102.87)
@@ -5366,6 +5378,12 @@
 		(uuid "d9667d30-096d-40bd-b772-44cdf4d28b30")
 	)
 	(junction
+		(at 62.23 113.03)
+		(diameter 0)
+		(color 0 0 0 0)
+		(uuid "dfe15d5f-656a-49b3-9042-a1727acd9db8")
+	)
+	(junction
 		(at 71.12 182.88)
 		(diameter 0)
 		(color 0 0 0 0)
@@ -5382,6 +5400,12 @@
 		(diameter 0)
 		(color 0 0 0 0)
 		(uuid "e964d0a5-34d3-43f5-89f5-15d3a4341704")
+	)
+	(junction
+		(at 62.23 97.79)
+		(diameter 0)
+		(color 0 0 0 0)
+		(uuid "f11e0abd-84d3-461f-b086-ca63af86d509")
 	)
 	(no_connect
 		(at 95.25 107.95)
@@ -5549,13 +5573,23 @@
 	)
 	(wire
 		(pts
-			(xy 62.23 125.73) (xy 62.23 110.49)
+			(xy 62.23 125.73) (xy 62.23 113.03)
 		)
 		(stroke
 			(width 0)
 			(type default)
 		)
 		(uuid "08a17591-cbce-4b3d-9861-74da2f6b26ce")
+	)
+	(wire
+		(pts
+			(xy 38.1 113.03) (xy 50.8 113.03)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "093b8aac-bdda-4676-b464-8e313bcd29be")
 	)
 	(wire
 		(pts
@@ -5586,6 +5620,26 @@
 			(type default)
 		)
 		(uuid "0ccfe5f1-5e19-4b13-bee4-aa6a851cb296")
+	)
+	(wire
+		(pts
+			(xy 38.1 128.27) (xy 53.34 128.27)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "0d3da496-e07c-4a8c-b480-8353e97334a4")
+	)
+	(wire
+		(pts
+			(xy 62.23 128.27) (xy 62.23 125.73)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "0faf4beb-bc84-4470-8d58-5b035585b056")
 	)
 	(wire
 		(pts
@@ -5646,6 +5700,16 @@
 			(type default)
 		)
 		(uuid "18811590-7249-409d-97c2-2a05c1993bc2")
+	)
+	(wire
+		(pts
+			(xy 62.23 82.55) (xy 62.23 95.25)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "18cf1f93-6caa-4925-8bf2-181c136f417f")
 	)
 	(wire
 		(pts
@@ -5829,6 +5893,16 @@
 	)
 	(wire
 		(pts
+			(xy 60.96 128.27) (xy 62.23 128.27)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "2d22e237-1604-4cec-a1a0-4d9c7c221116")
+	)
+	(wire
+		(pts
 			(xy 219.71 97.79) (xy 218.44 97.79)
 		)
 		(stroke
@@ -5836,6 +5910,16 @@
 			(type default)
 		)
 		(uuid "2d5f3d99-d40f-43dd-bd58-80b91fede539")
+	)
+	(wire
+		(pts
+			(xy 58.42 113.03) (xy 62.23 113.03)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "2e22002e-e25e-4bf2-9602-def245fa7a63")
 	)
 	(wire
 		(pts
@@ -5919,7 +6003,7 @@
 	)
 	(wire
 		(pts
-			(xy 62.23 95.25) (xy 62.23 110.49)
+			(xy 62.23 95.25) (xy 62.23 97.79)
 		)
 		(stroke
 			(width 0)
@@ -6149,13 +6233,23 @@
 	)
 	(wire
 		(pts
-			(xy 62.23 80.01) (xy 62.23 95.25)
+			(xy 62.23 80.01) (xy 62.23 82.55)
 		)
 		(stroke
 			(width 0)
 			(type default)
 		)
 		(uuid "599b13a5-c0bd-4ce5-8638-39a3fc2722a4")
+	)
+	(wire
+		(pts
+			(xy 38.1 82.55) (xy 50.8 82.55)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "5b493453-25cb-47f7-8c9a-f85cbcc1e0fc")
 	)
 	(wire
 		(pts
@@ -6256,6 +6350,16 @@
 			(type default)
 		)
 		(uuid "629ad3e7-c571-4fa6-bbff-2cf1d28ba4fd")
+	)
+	(wire
+		(pts
+			(xy 62.23 113.03) (xy 62.23 110.49)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "632f844d-9696-4af0-9733-bf09646ece49")
 	)
 	(wire
 		(pts
@@ -6469,6 +6573,16 @@
 	)
 	(wire
 		(pts
+			(xy 38.1 97.79) (xy 50.8 97.79)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "7cc42fce-03ac-44d4-87da-17f206ace2ad")
+	)
+	(wire
+		(pts
 			(xy 204.47 158.75) (xy 194.31 158.75)
 		)
 		(stroke
@@ -6566,6 +6680,16 @@
 			(type default)
 		)
 		(uuid "885365bd-5468-4836-94e7-9e0908a1b85c")
+	)
+	(wire
+		(pts
+			(xy 58.42 82.55) (xy 62.23 82.55)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "894ec4ee-0c05-44dd-81f4-8db0054fcf6f")
 	)
 	(wire
 		(pts
@@ -7126,6 +7250,26 @@
 			(type default)
 		)
 		(uuid "d1ec915f-2afd-4c08-a1de-479b54321b83")
+	)
+	(wire
+		(pts
+			(xy 58.42 97.79) (xy 62.23 97.79)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "d247ad3b-cf99-4683-8d0d-c93550b280bf")
+	)
+	(wire
+		(pts
+			(xy 62.23 97.79) (xy 62.23 110.49)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "d5ed41f5-ab44-4562-8fcb-312765b7ca8b")
 	)
 	(wire
 		(pts
@@ -9626,6 +9770,82 @@
 		)
 	)
 	(symbol
+		(lib_id "Device:R")
+		(at 54.61 113.03 90)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(uuid "4fcffea6-39c8-4607-8584-bfdd0582dc61")
+		(property "Reference" "R20"
+			(at 54.61 117.856 90)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Value" "1k"
+			(at 54.61 115.824 90)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" "Resistor_SMD:R_0402_1005Metric_Pad0.72x0.64mm_HandSolder"
+			(at 54.61 114.808 90)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" "~"
+			(at 54.61 113.03 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" "Resistor"
+			(at 54.61 113.03 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "LCSC" "C25744"
+			(at 54.61 113.03 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "dda09147-8755-48e4-bdf9-d6a582e99589")
+		)
+		(pin "2"
+			(uuid "1f41a1cc-b7ad-4d3f-9796-609a515abbe7")
+		)
+		(instances
+			(project "temper"
+				(path "/ad9b79b0-4738-4cc8-a254-afb39ba62b16"
+					(reference "R20")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
 		(lib_id "Connector_Generic:Conn_01x03")
 		(at 33.02 82.55 180)
 		(unit 1)
@@ -9852,6 +10072,82 @@
 			(project "temper"
 				(path "/ad9b79b0-4738-4cc8-a254-afb39ba62b16"
 					(reference "JP2")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "Device:R")
+		(at 54.61 82.55 90)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(uuid "70231177-0306-4774-bcd1-a4c3fb9861bc")
+		(property "Reference" "R18"
+			(at 54.61 87.376 90)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Value" "1k"
+			(at 54.61 85.344 90)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" "Resistor_SMD:R_0402_1005Metric_Pad0.72x0.64mm_HandSolder"
+			(at 54.61 84.328 90)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" "~"
+			(at 54.61 82.55 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" "Resistor"
+			(at 54.61 82.55 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "LCSC" "C25744"
+			(at 54.61 82.55 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "0c554836-96d9-42b9-b36f-6cf58e6679f6")
+		)
+		(pin "2"
+			(uuid "c52b9858-cf9a-4dd5-acc0-caf45988acea")
+		)
+		(instances
+			(project "temper"
+				(path "/ad9b79b0-4738-4cc8-a254-afb39ba62b16"
+					(reference "R18")
 					(unit 1)
 				)
 			)
@@ -10206,6 +10502,82 @@
 			(project "temper"
 				(path "/ad9b79b0-4738-4cc8-a254-afb39ba62b16"
 					(reference "J4")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "Device:R")
+		(at 57.15 128.27 90)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(uuid "8388f7ec-350c-426c-af8e-ae33982e8225")
+		(property "Reference" "R21"
+			(at 57.15 133.096 90)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Value" "1k"
+			(at 57.15 131.064 90)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" "Resistor_SMD:R_0402_1005Metric_Pad0.72x0.64mm_HandSolder"
+			(at 57.15 130.048 90)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" "~"
+			(at 57.15 128.27 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" "Resistor"
+			(at 57.15 128.27 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "LCSC" "C25744"
+			(at 57.15 128.27 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "b359041b-934c-4058-99ed-cfe74f5a84cc")
+		)
+		(pin "2"
+			(uuid "eff15ca8-bbc8-4bc5-a580-40f0bd378799")
+		)
+		(instances
+			(project "temper"
+				(path "/ad9b79b0-4738-4cc8-a254-afb39ba62b16"
+					(reference "R21")
 					(unit 1)
 				)
 			)
@@ -10816,6 +11188,82 @@
 			(project "temper"
 				(path "/ad9b79b0-4738-4cc8-a254-afb39ba62b16"
 					(reference "R16")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "Device:R")
+		(at 54.61 97.79 90)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(uuid "a856268d-c407-40d1-9e8e-f5079080c62a")
+		(property "Reference" "R19"
+			(at 54.61 102.616 90)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Value" "1k"
+			(at 54.61 100.584 90)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" "Resistor_SMD:R_0402_1005Metric_Pad0.72x0.64mm_HandSolder"
+			(at 54.61 99.568 90)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" "~"
+			(at 54.61 97.79 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" "Resistor"
+			(at 54.61 97.79 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "LCSC" "C25744"
+			(at 54.61 97.79 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "47d826f6-f3a7-4ce7-b928-d5a8aea055de")
+		)
+		(pin "2"
+			(uuid "dcca2301-77c0-451d-9d31-f736810c83f3")
+		)
+		(instances
+			(project "temper"
+				(path "/ad9b79b0-4738-4cc8-a254-afb39ba62b16"
+					(reference "R19")
 					(unit 1)
 				)
 			)
