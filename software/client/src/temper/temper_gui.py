@@ -16,6 +16,7 @@ from p3lib.boot_manager import BootManager
 
 from temper.temper_db import TemperDB
 
+MAX_DB_READINGS_LIMIT = 50000
 
 # ---------------------------------------------------------------------------
 # Message types sent from worker threads → GUI queue
@@ -586,7 +587,7 @@ def index_page() -> None:
         _set_loading(True)
         threading.Thread(
             target=_worker_load_readings,
-            args=(db, gui_queue, unit, state["since"], 5000),
+            args=(db, gui_queue, unit, state["since"], MAX_DB_READINGS_LIMIT),
             daemon=True,
         ).start()
 
@@ -1025,7 +1026,10 @@ def gui_main(start_web_browser: bool, server_port: int) -> None:
 
 def main():
     """@brief Program entry point"""
+    global MAX_DB_READINGS_LIMIT
+
     uio = UIO()
+    uio.info(f"temper: v{TemperDB.VERSION}")
     options = None
     try:
         parser = argparse.ArgumentParser(
@@ -1037,6 +1041,8 @@ def main():
                             help="TCP port for the NiceGUI server (default=8085).")
         parser.add_argument("-n", "--no_web_launch", action="store_true",
                             help="Do not open web browser automatically.")
+        parser.add_argument("-m", "--max_db_readings_limit", type=int, default=MAX_DB_READINGS_LIMIT,
+                            help=f"The maximum number of readings to read from the database. (default={MAX_DB_READINGS_LIMIT}).")
         launcher = Launcher("icon.png", app_name="temper")
         launcher.addLauncherArgs(parser)
 
@@ -1045,6 +1051,7 @@ def main():
 
         options = parser.parse_args()
         uio.enableDebug(options.debug)
+        MAX_DB_READINGS_LIMIT = options.max_db_readings_limit
 
         handled = launcher.handleLauncherArgs(options, uio=uio)
         if not handled:
