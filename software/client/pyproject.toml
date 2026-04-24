@@ -1,6 +1,6 @@
 [project]
 name = "temper"
-version = "0.2.9"
+version = "0.2.11"
 description = "An app to allow temperature and humidity data from temper hardware to be saved to a database and displayed."
 authors = [
     {name = "Paul Austen",email = "pjaos@gmail.com"}
@@ -16,7 +16,7 @@ packages = [{include = "temper", from = "src"}]
 [tool.poetry.dependencies]
 pytest = "*"
 nicegui = "^3.9.0"
-p3lib = "^1.1.158"
+p3lib = "^1.1.160"
 pillow = "*"
 psutil = "*"
 rich = "*"
