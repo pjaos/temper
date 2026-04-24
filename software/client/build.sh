@@ -1,5 +1,7 @@
 #!/bin/bash
-mkdir src/temper/assets
+if [ ! -d "src/temper/assets" ]; then
+    mkdir src/temper/assets
+fi
 
 set -e # Stop on code check or test errors
 ./check_code.sh # Run some checks on the code before building it
