@@ -143,10 +143,26 @@ GLOBAL_CSS = """
 
 *, *::before, *::after { box-sizing: border-box; }
 
-body, .nicegui-content {
+html, body {
+    width: 100% !important;
+    max-width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    overflow-x: hidden;
+}
+
+/* NiceGUI / Quasar page containers — must all be full width */
+body,
+.nicegui-content,
+.q-page-container,
+.q-page,
+.q-layout,
+.q-layout__section--marginal {
     background: var(--bg) !important;
     color: var(--text) !important;
     font-family: 'DM Sans', sans-serif !important;
+    width: 100% !important;
+    max-width: 100% !important;
     margin: 0 !important;
     padding: 0 !important;
     min-height: 100vh;
@@ -155,6 +171,7 @@ body, .nicegui-content {
 .app-shell {
     display: flex;
     flex-direction: column;
+    width: 100%;
     min-height: 100vh;
 }
 
@@ -356,7 +373,11 @@ body, .nicegui-content {
 
 .q-field__control, .q-field__native { color: var(--text) !important; }
 .q-field { color: var(--text) !important; }
-.nicegui-plot { width: 100% !important; }
+.nicegui-plot,
+.nicegui-plot > div,
+.nicegui-plot .js-plotly-plot,
+.nicegui-plot .plot-container,
+.nicegui-plot .svg-container { width: 100% !important; display: block !important; }
 .q-date, .q-date__header { background: var(--surface2) !important; color: var(--text) !important; }
 
 .delete-btn {
