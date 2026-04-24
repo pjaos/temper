@@ -229,6 +229,117 @@ class TestWorkerLoadUnits:
 
 
 # ---------------------------------------------------------------------------
+# TestUtcStrToLocal
+# ---------------------------------------------------------------------------
+
+class TestUtcStrToLocal:
+
+    def test_returns_string(self):
+        result = tg._utc_str_to_local("2024-01-15 12:00:00")
+        assert isinstance(result, str)
+
+    def test_output_has_same_format(self):
+        result = tg._utc_str_to_local("2024-01-15 12:00:00")
+        # Must match YYYY-MM-DD HH:MM:SS
+        datetime.strptime(result, "%Y-%m-%d %H:%M:%S")
+
+    def test_empty_string_returned_unchanged(self):
+        assert tg._utc_str_to_local("") == ""
+
+    def test_none_like_empty_returned_unchanged(self):
+        """A falsy value that is not a valid timestamp should pass through."""
+        assert tg._utc_str_to_local("") == ""
+
+    def test_malformed_timestamp_returned_unchanged(self):
+        bad = "not-a-timestamp"
+        assert tg._utc_str_to_local(bad) == bad
+
+    def test_partial_timestamp_returned_unchanged(self):
+        bad = "2024-01-15"   # date only, missing time — not the expected format
+        assert tg._utc_str_to_local(bad) == bad
+
+    def test_converts_utc_to_some_local_time(self):
+        """The result should differ from input by the local UTC offset (or be equal if UTC)."""
+        ts     = "2024-06-15 10:00:00"
+        result = tg._utc_str_to_local(ts)
+        # Result must be a valid datetime string — exact value depends on local tz
+        dt = datetime.strptime(result, "%Y-%m-%d %H:%M:%S")
+        assert dt is not None
+
+
+# ---------------------------------------------------------------------------
+# TestWorkerDeleteUnit
+# ---------------------------------------------------------------------------
+
+class TestWorkerDeleteUnit:
+
+    def _make_db(self, deleted=10, raise_exc=None):
+        db = MagicMock()
+        if raise_exc:
+            db.delete_unit.side_effect = raise_exc
+        else:
+            db.delete_unit.return_value = deleted
+        return db
+
+    def test_posts_status_then_deleted(self):
+        db = self._make_db(deleted=5)
+        q  = queue.Queue()
+        tg._worker_delete_unit(db, q, "UNIT_A")
+        msgs   = [q.get_nowait() for _ in range(q.qsize())]
+        types_ = [m["type"] for m in msgs]
+        assert tg.MSG_STATUS       in types_
+        assert tg.MSG_UNIT_DELETED in types_
+
+    def test_deleted_payload_contains_unit_name(self):
+        db = self._make_db(deleted=3)
+        q  = queue.Queue()
+        tg._worker_delete_unit(db, q, "MY_UNIT")
+        msgs    = [q.get_nowait() for _ in range(q.qsize())]
+        payload = next(m for m in msgs if m["type"] == tg.MSG_UNIT_DELETED)
+        assert payload["unit"] == "MY_UNIT"
+
+    def test_deleted_payload_contains_readings_count(self):
+        db = self._make_db(deleted=42)
+        q  = queue.Queue()
+        tg._worker_delete_unit(db, q, "U")
+        msgs    = [q.get_nowait() for _ in range(q.qsize())]
+        payload = next(m for m in msgs if m["type"] == tg.MSG_UNIT_DELETED)
+        assert payload["readings_deleted"] == 42
+
+    def test_posts_error_on_db_exception(self):
+        db = self._make_db(raise_exc=ValueError("Unit not found"))
+        q  = queue.Queue()
+        tg._worker_delete_unit(db, q, "GHOST")
+        msgs       = [q.get_nowait() for _ in range(q.qsize())]
+        error_msgs = [m for m in msgs if m["type"] == tg.MSG_ERROR]
+        assert len(error_msgs) == 1
+        assert "Unit not found" in error_msgs[0]["text"]
+
+    def test_calls_delete_unit_with_correct_name(self):
+        db = self._make_db(deleted=0)
+        q  = queue.Queue()
+        tg._worker_delete_unit(db, q, "TARGET")
+        db.delete_unit.assert_called_once_with("TARGET")
+
+    def test_status_message_mentions_unit_name(self):
+        db = self._make_db(deleted=1)
+        q  = queue.Queue()
+        tg._worker_delete_unit(db, q, "TEMPER_DEV")
+        msgs        = [q.get_nowait() for _ in range(q.qsize())]
+        status_msgs = [m for m in msgs if m["type"] == tg.MSG_STATUS]
+        assert any("TEMPER_DEV" in m["text"] for m in status_msgs)
+
+    def test_zero_readings_deleted_is_valid(self):
+        """A unit with no readings still posts a valid MSG_UNIT_DELETED."""
+        db = self._make_db(deleted=0)
+        q  = queue.Queue()
+        tg._worker_delete_unit(db, q, "EMPTY_UNIT")
+        msgs    = [q.get_nowait() for _ in range(q.qsize())]
+        payload = next(m for m in msgs if m["type"] == tg.MSG_UNIT_DELETED)
+        assert payload["readings_deleted"] == 0
+
+
+# ---------------------------------------------------------------------------
 # TestWorkerLoadReadings
 # ---------------------------------------------------------------------------
 
@@ -255,7 +366,8 @@ class TestWorkerLoadReadings:
         assert tg.MSG_READINGS_LOADED in types_
 
     def test_readings_reversed_oldest_first(self):
-        """DB returns newest-first (DESC); worker must reverse to oldest-first."""
+        """DB returns newest-first (DESC); worker must reverse to oldest-first.
+        Timestamps are converted to local time, but relative order is preserved."""
         rows_desc = [
             _make_row("2024-01-01 12:00:00"),
             _make_row("2024-01-01 11:00:00"),
@@ -266,6 +378,7 @@ class TestWorkerLoadReadings:
         tg._worker_load_readings(db, q, "UNIT_A", None, 1000)
         msgs    = [q.get_nowait() for _ in range(q.qsize())]
         payload = next(m for m in msgs if m["type"] == tg.MSG_READINGS_LOADED)
+        # Timestamps have been converted to local time but order must be preserved
         timestamps = [r["recorded_at"] for r in payload["rows"]]
         assert timestamps == sorted(timestamps)
 
@@ -315,6 +428,26 @@ class TestWorkerLoadReadings:
         q  = queue.Queue()
         tg._worker_load_readings(db, q, "U", None, 1000)
         db.get_readings_for_unit.assert_called_once_with("U", since=None, limit=1000)
+
+    def test_utc_conversion_applied_to_recorded_at(self):
+        """recorded_at values in the payload must have passed through _utc_str_to_local."""
+        rows = [_make_row("2024-06-15 10:00:00")]
+        db   = self._make_db(rows=rows)
+        q    = queue.Queue()
+        with patch.object(tg, "_utc_str_to_local", wraps=tg._utc_str_to_local) as mock_conv:
+            tg._worker_load_readings(db, q, "U", None, 1000)
+        mock_conv.assert_called()
+
+    def test_recorded_at_in_payload_is_valid_datetime_string(self):
+        """After UTC conversion the timestamp must still be parseable."""
+        rows = [_make_row("2024-06-15 10:00:00")]
+        db   = self._make_db(rows=rows)
+        q    = queue.Queue()
+        tg._worker_load_readings(db, q, "U", None, 1000)
+        msgs    = [q.get_nowait() for _ in range(q.qsize())]
+        payload = next(m for m in msgs if m["type"] == tg.MSG_READINGS_LOADED)
+        ts = payload["rows"][0]["recorded_at"]
+        datetime.strptime(ts, "%Y-%m-%d %H:%M:%S")   # must not raise
 
 
 # ---------------------------------------------------------------------------
@@ -635,8 +768,13 @@ class TestConstants:
             tg.MSG_READINGS_LOADED,
             tg.MSG_ERROR,
             tg.MSG_STATUS,
+            tg.MSG_UNIT_DELETED,
         }
-        assert len(types_) == 4
+        assert len(types_) == 5
+
+    def test_max_db_readings_limit_is_positive_int(self):
+        assert isinstance(tg.MAX_DB_READINGS_LIMIT, int)
+        assert tg.MAX_DB_READINGS_LIMIT > 0
 
     def test_plotly_layout_has_dark_hover(self):
         assert tg.PLOTLY_LAYOUT["hoverlabel"]["bgcolor"] == "#1f2937"
