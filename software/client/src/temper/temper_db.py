@@ -268,8 +268,23 @@ class TemperDB(object):
     def reap(self):
         """@brief Send messages to temper hardware. Retrieve data from them and save it to a local sqlite db."""
         AreYouThereThread.PERIODICITY_SECONDS = self._options.seconds
+        # Prune old records at startup before the listener begins
+        self._prune_old_readings()
         # Start a background thread that gets data from temper hardware.
         self._start_temper_hardware_listener()
+
+    # Prune once per day while running
+    _PRUNE_INTERVAL_SECS = 86400
+
+    def _prune_old_readings(self):
+        """@brief Delete readings older than --max_age_days if the option is set."""
+        days = getattr(self._options, "max_age_days", 0)
+        if days and days > 0:
+            deleted = self.prune_readings_older_than(days)
+            if deleted:
+                self._uio.info(f"Pruned {deleted} reading(s) older than {days} day(s)")
+            else:
+                self._uio.debug(f"Prune complete: no readings older than {days} day(s)")
 
     def _start_temper_hardware_listener(self):
         """@brief Search for all TEMPER units on the LAN and display stats received from all units."""
@@ -278,9 +293,14 @@ class TemperDB(object):
         self._localYViewCollector.setValidProductIDList(TemperDB.VALID_PRODUCT_ID_LIST)
         self._localYViewCollector.addDevListener(self)
         self._localYViewCollector.start()
-        # Wait here while until user CTRL C
+        # Wait here until user CTRL-C; prune old records once a day
+        elapsed = 0
         while True:
             sleep(1)
+            elapsed += 1
+            if elapsed >= TemperDB._PRUNE_INTERVAL_SECS:
+                self._prune_old_readings()
+                elapsed = 0
 
     def hear(self, devDict):
         """@brief Called when data is received from the device.
@@ -554,7 +574,8 @@ def main():
                                          formatter_class=argparse.RawDescriptionHelpFormatter)
         parser.add_argument("-d", "--debug",   action='store_true', help="Enable debugging.")
         parser.add_argument("-a", "--address", help="Enter the IP address of the temper unit to record data from. If not set then data is recorded from all temper units found.", default=None)
-        parser.add_argument("-s", "--seconds",  type=int, help="The sensor poll time in seconds (default = 10).", default=10)
+        parser.add_argument("-s", "--seconds",  type=int, help="The sensor poll time in seconds (default = 60).", default=60)
+        parser.add_argument("-m", "--max_age_days", type=int, default=30, help="Automatically delete readings older than this many days (default = 30). Set to 0 to disable.")
 
         # Add args for auto boot cmd
         BootManager.AddCmdArgs(parser)
