@@ -520,6 +520,7 @@ class WebServer():
         async def rmdir(request):
             return get_json(self._rmDir(request))
 
+        # To set name use http://<IP Address>/set_name?name="Solis Storage Battery"
         @app.route('/set_name')
         async def set_name(request):
             return get_json(self._set_name(request))

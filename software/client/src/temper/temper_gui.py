@@ -65,12 +65,12 @@ def load_sensor_names() -> dict:
         }
 
     Missing keys within a unit's dict are backfilled from DEFAULT_SENSOR_NAMES.
+    Returns {} if no file exists or the file is corrupt.
     """
     p = _config_path()
     if p.exists():
         try:
             data = json.loads(p.read_text())
-            # Backfill any missing sensor keys for each unit
             return {
                 unit: {k: data[unit].get(k, v) for k, v in DEFAULT_SENSOR_NAMES.items()}
                 for unit in data
@@ -81,7 +81,8 @@ def load_sensor_names() -> dict:
 
 
 def get_names_for_unit(all_names: dict, unit_name: str) -> dict:
-    """Return the sensor name mapping for a specific unit, creating defaults if absent."""
+    """Return the sensor name mapping for a specific unit.
+    Creates a default entry in all_names if the unit is not yet known."""
     if unit_name not in all_names:
         all_names[unit_name] = _default_names_for_unit()
     return all_names[unit_name]
@@ -556,7 +557,7 @@ def _latest_values(rows: list[dict], sensor_names: dict) -> dict:
 # ---------------------------------------------------------------------------
 
 _db: Optional[TemperDB]  = None
-_sensor_names: dict       = {}   # { unit_name: { "sensor_N": display_name, ... } }
+_sensor_names: dict       = {}
 
 
 # ---------------------------------------------------------------------------
@@ -575,8 +576,8 @@ def index_page() -> None:
 
     The DB object and sensor_names are shared (module-level) across connections.
     """
-    db         = _db          # module-level, read-only access per connection
-    all_names  = _sensor_names  # { unit_name -> { sensor_key -> display_name } }
+    db        = _db            # module-level, read-only access per connection
+    all_names = _sensor_names  # { unit_name -> { sensor_key -> display_name } }
 
     # Active sensor names for the currently selected unit (updated on unit switch)
     sensor_names: dict = dict(DEFAULT_SENSOR_NAMES)
@@ -619,10 +620,10 @@ def index_page() -> None:
         "range_btns":         {},
         "mode_btns":          {},
         "custom_row":         None,
-        "date_from":               None,
-        "date_to":                 None,
-        "sensor_name_inputs":      {},
-        "sensor_name_unit_label":  None,
+        "date_from":              None,
+        "date_to":                None,
+        "sensor_name_inputs":     {},
+        "sensor_name_unit_label": None,
     }
 
     # ── Worker launchers ─────────────────────────────────────────────────────
@@ -749,7 +750,10 @@ def index_page() -> None:
                 state["loading"] = False
                 _set_loading(False)
                 _show_error(None)
-                _update_status(f"{len(rows)} reading(s) — {msg['unit']}")
+                unit = msg["unit"]
+                ip   = _get_unit_ip(unit)
+                ip_part = f"  ·  {ip}" if ip else ""
+                _update_status(f"{unit}{ip_part}  ·  {len(rows)} reading(s)")
                 _render_stats(rows)
                 _render_chart(rows)
 
@@ -771,10 +775,19 @@ def index_page() -> None:
 
     # ── Interaction handlers ─────────────────────────────────────────────────
 
+    def _get_unit_ip(name: str) -> str:
+        """Return the IP address for a unit name, or empty string if not found."""
+        for u in state["units"]:
+            if u["unit_name"] == name:
+                return u.get("ip_address") or ""
+        return ""
+
     def _select_unit(name: str):
         state["selected_unit"] = name
         _refresh_unit_chips()
         _load_sensor_names_for_unit(name)
+        ip = _get_unit_ip(name)
+        _update_status(f"{name}  ·  {ip}" if ip else name)
         _apply_range_and_load()
 
     def _apply_range_and_load():
@@ -828,7 +841,9 @@ def index_page() -> None:
         save_sensor_names(all_names)
         _render_stats(state["rows"])
         _render_chart(state["rows"])
-        _update_status(f"Sensor names saved for {unit}")
+        ip = _get_unit_ip(unit)
+        ip_part = f"  ·  {ip}" if ip else ""
+        _update_status(f"Sensor names saved  ·  {unit}{ip_part}")
 
     def _load_sensor_names_for_unit(unit: str):
         """Reload sensor_names in-place from all_names for the given unit,
