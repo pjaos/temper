@@ -5,8 +5,9 @@
 	(uuid "ad9b79b0-4738-4cc8-a254-afb39ba62b16")
 	(paper "A4")
 	(title_block
-		(date "2026-04-20")
-		(rev "1.8")
+		(date "2026-05-14")
+		(rev "1.9")
+		(comment 1 "1.8 - 1.9 no changes to schematic. C2 moved on PCB.")
 	)
 	(lib_symbols
 		(symbol "Connector_Generic:Conn_01x02"
