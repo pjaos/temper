@@ -100,60 +100,79 @@ def _make_row(
 # TestSensorNamePersistence
 # ---------------------------------------------------------------------------
 
+# Per-unit config structure used throughout these tests:
+#   { unit_name: { "sensor_1": label, "sensor_2": label, ... } }
+SAMPLE_ALL_NAMES = {
+    "UNIT_A": {"sensor_1": "Living Room", "sensor_2": "Loft",    "sensor_3": "Outside", "sensor_4": "Rack"},
+    "UNIT_B": {"sensor_1": "Garden",      "sensor_2": "Kitchen", "sensor_3": "Sensor 3","sensor_4": "Sensor 4"},
+}
+
+
 class TestSensorNamePersistence:
 
-    def test_load_returns_defaults_when_no_file(self, tmp_path):
+    def test_load_returns_empty_dict_when_no_file(self, tmp_path):
+        """When no file exists load returns {} — defaults are injected per-unit on demand."""
         with patch.object(tg, "_config_path", return_value=tmp_path / "sensor_names.json"):
             names = tg.load_sensor_names()
-        assert names == tg.DEFAULT_SENSOR_NAMES
+        assert names == {}
 
-    def test_save_and_load_roundtrip(self, tmp_path):
+    def test_save_and_load_roundtrip_per_unit(self, tmp_path):
         path = tmp_path / "sensor_names.json"
         with patch.object(tg, "_config_path", return_value=path):
-            tg.save_sensor_names(SAMPLE_NAMES)
+            tg.save_sensor_names(SAMPLE_ALL_NAMES)
             loaded = tg.load_sensor_names()
-        assert loaded == SAMPLE_NAMES
+        assert loaded == SAMPLE_ALL_NAMES
 
     def test_save_writes_valid_json(self, tmp_path):
         path = tmp_path / "sensor_names.json"
         with patch.object(tg, "_config_path", return_value=path):
-            tg.save_sensor_names(SAMPLE_NAMES)
+            tg.save_sensor_names(SAMPLE_ALL_NAMES)
         data = json.loads(path.read_text())
-        assert data == SAMPLE_NAMES
+        assert data == SAMPLE_ALL_NAMES
 
-    def test_load_fills_missing_keys_with_defaults(self, tmp_path):
+    def test_load_backfills_missing_sensor_keys_per_unit(self, tmp_path):
+        """If a unit entry is missing some sensor keys, defaults fill the gaps."""
         path = tmp_path / "sensor_names.json"
-        path.write_text(json.dumps({"sensor_1": "Kitchen", "sensor_2": "Garage"}))
+        partial = {"UNIT_A": {"sensor_1": "Kitchen", "sensor_2": "Garage"}}
+        path.write_text(json.dumps(partial))
         with patch.object(tg, "_config_path", return_value=path):
-            names = tg.load_sensor_names()
-        assert names["sensor_1"] == "Kitchen"
-        assert names["sensor_2"] == "Garage"
-        assert names["sensor_3"] == tg.DEFAULT_SENSOR_NAMES["sensor_3"]
-        assert names["sensor_4"] == tg.DEFAULT_SENSOR_NAMES["sensor_4"]
+            loaded = tg.load_sensor_names()
+        assert loaded["UNIT_A"]["sensor_1"] == "Kitchen"
+        assert loaded["UNIT_A"]["sensor_2"] == "Garage"
+        assert loaded["UNIT_A"]["sensor_3"] == tg.DEFAULT_SENSOR_NAMES["sensor_3"]
+        assert loaded["UNIT_A"]["sensor_4"] == tg.DEFAULT_SENSOR_NAMES["sensor_4"]
 
-    def test_load_returns_defaults_on_corrupt_json(self, tmp_path):
+    def test_load_returns_empty_dict_on_corrupt_json(self, tmp_path):
         path = tmp_path / "sensor_names.json"
         path.write_text("{ this is not valid json }")
         with patch.object(tg, "_config_path", return_value=path):
             names = tg.load_sensor_names()
-        assert names == tg.DEFAULT_SENSOR_NAMES
+        assert names == {}
 
     def test_save_overwrites_existing_file(self, tmp_path):
         path = tmp_path / "sensor_names.json"
-        path.write_text(json.dumps({"sensor_1": "Old Name"}))
-        new_names = dict(tg.DEFAULT_SENSOR_NAMES)
-        new_names["sensor_1"] = "New Name"
+        path.write_text(json.dumps({"UNIT_A": {"sensor_1": "Old Name"}}))
+        updated = {"UNIT_A": dict(tg.DEFAULT_SENSOR_NAMES)}
+        updated["UNIT_A"]["sensor_1"] = "New Name"
         with patch.object(tg, "_config_path", return_value=path):
-            tg.save_sensor_names(new_names)
-            loaded = tg.load_sensor_names()
-        assert loaded["sensor_1"] == "New Name"
+            tg.save_sensor_names(updated)
+            reloaded = tg.load_sensor_names()
+        assert reloaded["UNIT_A"]["sensor_1"] == "New Name"
 
-    def test_all_four_keys_always_present_after_load(self, tmp_path):
+    def test_multiple_units_preserved_independently(self, tmp_path):
+        path = tmp_path / "sensor_names.json"
+        with patch.object(tg, "_config_path", return_value=path):
+            tg.save_sensor_names(SAMPLE_ALL_NAMES)
+            loaded = tg.load_sensor_names()
+        assert loaded["UNIT_A"]["sensor_1"] == "Living Room"
+        assert loaded["UNIT_B"]["sensor_1"] == "Garden"
+
+    def test_load_empty_object_returns_empty_dict(self, tmp_path):
         path = tmp_path / "sensor_names.json"
         path.write_text("{}")
         with patch.object(tg, "_config_path", return_value=path):
             names = tg.load_sensor_names()
-        assert set(names.keys()) == {"sensor_1", "sensor_2", "sensor_3", "sensor_4"}
+        assert names == {}
 
     def test_config_path_creates_directory(self, tmp_path):
         """_config_path() must not raise even when the target directory is new."""
@@ -163,6 +182,47 @@ class TestSensorNamePersistence:
                     tg._config_path()
                 except Exception:
                     pass  # directory creation may fail in mock env — acceptable
+
+
+# ---------------------------------------------------------------------------
+# TestGetNamesForUnit
+# ---------------------------------------------------------------------------
+
+class TestGetNamesForUnit:
+
+    def test_returns_defaults_for_unknown_unit(self):
+        """A unit not in all_names gets a default entry created in-place."""
+        all_names = {}
+        names = tg.get_names_for_unit(all_names, "NEW_UNIT")
+        assert names == tg.DEFAULT_SENSOR_NAMES
+
+    def test_creates_entry_in_all_names_for_unknown_unit(self):
+        all_names = {}
+        tg.get_names_for_unit(all_names, "NEW_UNIT")
+        assert "NEW_UNIT" in all_names
+
+    def test_returns_existing_names_for_known_unit(self):
+        all_names = {"UNIT_A": dict(SAMPLE_NAMES)}
+        names = tg.get_names_for_unit(all_names, "UNIT_A")
+        assert names == SAMPLE_NAMES
+
+    def test_does_not_overwrite_existing_entry(self):
+        existing = {"sensor_1": "My Room", "sensor_2": "Loft",
+                    "sensor_3": "Outside", "sensor_4": "Rack"}
+        all_names = {"UNIT_A": existing}
+        tg.get_names_for_unit(all_names, "UNIT_A")
+        assert all_names["UNIT_A"]["sensor_1"] == "My Room"
+
+    def test_different_units_get_independent_dicts(self):
+        all_names = {}
+        names_a = tg.get_names_for_unit(all_names, "UNIT_A")
+        names_b = tg.get_names_for_unit(all_names, "UNIT_B")
+        names_a["sensor_1"] = "Modified"
+        assert names_b["sensor_1"] != "Modified"
+
+    def test_returned_dict_has_all_four_keys(self):
+        names = tg.get_names_for_unit({}, "X")
+        assert set(names.keys()) == {"sensor_1", "sensor_2", "sensor_3", "sensor_4"}
 
 
 # ---------------------------------------------------------------------------
@@ -665,19 +725,23 @@ class TestModuleLevelState:
 
         with patch.object(tg.TemperDB, "__new__", return_value=fake_db), \
              patch.object(tg.TemperDB, "GetDBFile", return_value=str(tmp_path / "t.db")), \
-             patch.object(tg, "load_sensor_names", return_value=dict(tg.DEFAULT_SENSOR_NAMES)), \
+             patch.object(tg, "load_sensor_names", return_value={}), \
              patch.object(_ui_mock, "run"):          # prevent actually starting the server
             tg.gui_main(False, 8085)
 
         assert tg._db is fake_db
 
     def test_gui_main_sets_sensor_names(self, tmp_path):
-        """gui_main() must populate _sensor_names from load_sensor_names()."""
+        """gui_main() must populate _sensor_names from load_sensor_names().
+        _sensor_names is now a dict-of-dicts keyed by unit name."""
         fake_db = MagicMock()
         fake_db.get_connection.return_value.__enter__ = lambda s: MagicMock()
         fake_db.get_connection.return_value.__exit__  = lambda s, *a: False
-        expected = dict(tg.DEFAULT_SENSOR_NAMES)
-        expected["sensor_1"] = "Loaded Name"
+        expected = {
+            "UNIT_A": dict(tg.DEFAULT_SENSOR_NAMES),
+            "UNIT_B": dict(tg.DEFAULT_SENSOR_NAMES),
+        }
+        expected["UNIT_A"]["sensor_1"] = "Loaded Name"
 
         with patch.object(tg.TemperDB, "__new__", return_value=fake_db), \
              patch.object(tg.TemperDB, "GetDBFile", return_value=str(tmp_path / "t.db")), \
@@ -685,7 +749,7 @@ class TestModuleLevelState:
              patch.object(_ui_mock, "run"):
             tg.gui_main(False, 8085)
 
-        assert tg._sensor_names["sensor_1"] == "Loaded Name"
+        assert tg._sensor_names["UNIT_A"]["sensor_1"] == "Loaded Name"
 
     def test_gui_main_calls_ui_run_with_correct_port(self, tmp_path):
         """ui.run() must be called with the port supplied to gui_main()."""
@@ -695,7 +759,7 @@ class TestModuleLevelState:
 
         with patch.object(tg.TemperDB, "__new__", return_value=fake_db), \
              patch.object(tg.TemperDB, "GetDBFile", return_value=str(tmp_path / "t.db")), \
-             patch.object(tg, "load_sensor_names", return_value=dict(tg.DEFAULT_SENSOR_NAMES)), \
+             patch.object(tg, "load_sensor_names", return_value={}), \
              patch.object(_ui_mock, "run") as mock_run:
             tg.gui_main(False, 9999)
 
@@ -712,7 +776,7 @@ class TestModuleLevelState:
         for flag in (True, False):
             with patch.object(tg.TemperDB, "__new__", return_value=fake_db), \
                  patch.object(tg.TemperDB, "GetDBFile", return_value=str(tmp_path / "t.db")), \
-                 patch.object(tg, "load_sensor_names", return_value=dict(tg.DEFAULT_SENSOR_NAMES)), \
+                 patch.object(tg, "load_sensor_names", return_value={}), \
                  patch.object(_ui_mock, "run") as mock_run:
                 tg.gui_main(flag, 8085)
             _, kwargs = mock_run.call_args
@@ -723,14 +787,15 @@ class TestModuleLevelState:
         assert callable(tg.index_page)
 
     def test_sensor_names_updated_by_save_sensor_names(self, tmp_path):
-        """save_sensor_names writes through to disk; subsequent load picks it up."""
+        """save_sensor_names writes through to disk; subsequent load picks it up.
+        Uses the per-unit dict-of-dicts structure."""
         path = tmp_path / "sensor_names.json"
-        updated = dict(tg.DEFAULT_SENSOR_NAMES)
-        updated["sensor_2"] = "Garden"
+        updated = {"UNIT_A": dict(tg.DEFAULT_SENSOR_NAMES)}
+        updated["UNIT_A"]["sensor_2"] = "Garden"
         with patch.object(tg, "_config_path", return_value=path):
             tg.save_sensor_names(updated)
             reloaded = tg.load_sensor_names()
-        assert reloaded["sensor_2"] == "Garden"
+        assert reloaded["UNIT_A"]["sensor_2"] == "Garden"
 
 
 # ---------------------------------------------------------------------------

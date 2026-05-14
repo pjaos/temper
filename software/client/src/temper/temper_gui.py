@@ -49,18 +49,46 @@ def _config_path() -> Path:
     return cfg / "sensor_names.json"
 
 
+def _default_names_for_unit() -> dict:
+    """Return a fresh copy of the default sensor names for one unit."""
+    return dict(DEFAULT_SENSOR_NAMES)
+
+
 def load_sensor_names() -> dict:
+    """Load the full per-unit sensor names config.
+
+    Returns a dict of the form::
+
+        {
+            "UNIT_NAME_A": {"sensor_1": "Living Room", ...},
+            "UNIT_NAME_B": {"sensor_1": "Outside", ...},
+        }
+
+    Missing keys within a unit's dict are backfilled from DEFAULT_SENSOR_NAMES.
+    """
     p = _config_path()
     if p.exists():
         try:
             data = json.loads(p.read_text())
-            return {k: data.get(k, v) for k, v in DEFAULT_SENSOR_NAMES.items()}
+            # Backfill any missing sensor keys for each unit
+            return {
+                unit: {k: data[unit].get(k, v) for k, v in DEFAULT_SENSOR_NAMES.items()}
+                for unit in data
+            }
         except Exception:
             pass
-    return dict(DEFAULT_SENSOR_NAMES)
+    return {}
+
+
+def get_names_for_unit(all_names: dict, unit_name: str) -> dict:
+    """Return the sensor name mapping for a specific unit, creating defaults if absent."""
+    if unit_name not in all_names:
+        all_names[unit_name] = _default_names_for_unit()
+    return all_names[unit_name]
 
 
 def save_sensor_names(names: dict) -> None:
+    """Persist the full per-unit sensor names dict to disk."""
     _config_path().write_text(json.dumps(names, indent=2))
 
 
@@ -528,7 +556,7 @@ def _latest_values(rows: list[dict], sensor_names: dict) -> dict:
 # ---------------------------------------------------------------------------
 
 _db: Optional[TemperDB]  = None
-_sensor_names: dict       = {}
+_sensor_names: dict       = {}   # { unit_name: { "sensor_N": display_name, ... } }
 
 
 # ---------------------------------------------------------------------------
@@ -547,8 +575,11 @@ def index_page() -> None:
 
     The DB object and sensor_names are shared (module-level) across connections.
     """
-    db           = _db            # module-level, read-only access per connection
-    sensor_names = _sensor_names  # shared dict; saves are written through to disk
+    db         = _db          # module-level, read-only access per connection
+    all_names  = _sensor_names  # { unit_name -> { sensor_key -> display_name } }
+
+    # Active sensor names for the currently selected unit (updated on unit switch)
+    sensor_names: dict = dict(DEFAULT_SENSOR_NAMES)
 
     RANGE_PRESETS = {
         "1h":  ("1h",      timedelta(hours=1)),
@@ -588,9 +619,10 @@ def index_page() -> None:
         "range_btns":         {},
         "mode_btns":          {},
         "custom_row":         None,
-        "date_from":          None,
-        "date_to":            None,
-        "sensor_name_inputs": {},
+        "date_from":               None,
+        "date_to":                 None,
+        "sensor_name_inputs":      {},
+        "sensor_name_unit_label":  None,
     }
 
     # ── Worker launchers ─────────────────────────────────────────────────────
@@ -742,6 +774,7 @@ def index_page() -> None:
     def _select_unit(name: str):
         state["selected_unit"] = name
         _refresh_unit_chips()
+        _load_sensor_names_for_unit(name)
         _apply_range_and_load()
 
     def _apply_range_and_load():
@@ -782,15 +815,38 @@ def index_page() -> None:
         launch_load_units()
 
     def _on_save_sensor_names():
-        """Persist updated names, then refresh chart and stats on this connection."""
+        """Persist updated names for the selected unit, then refresh chart and stats."""
+        unit = state["selected_unit"]
+        if not unit:
+            return
         for key, inp in refs["sensor_name_inputs"].items():
             val = (inp.value or "").strip()
             sensor_names[key] = val if val else DEFAULT_SENSOR_NAMES[key]
             inp.value = sensor_names[key]
-        save_sensor_names(sensor_names)
+        # Write the per-unit names back into the shared store and persist
+        all_names[unit] = dict(sensor_names)
+        save_sensor_names(all_names)
         _render_stats(state["rows"])
         _render_chart(state["rows"])
-        _update_status("Sensor names saved")
+        _update_status(f"Sensor names saved for {unit}")
+
+    def _load_sensor_names_for_unit(unit: str):
+        """Reload sensor_names in-place from all_names for the given unit,
+        and update the sidebar input fields to match."""
+        names = get_names_for_unit(all_names, unit)
+        sensor_names.clear()
+        sensor_names.update(names)
+        # Update the unit label in the Sensor Names section
+        if refs.get("sensor_name_unit_label"):
+            refs["sensor_name_unit_label"].set_content(
+                f"<div style='font-size:0.68rem;color:var(--accent2);"
+                f"font-family:Space Mono,monospace;margin-bottom:8px;"
+                f"white-space:nowrap;overflow:hidden;text-overflow:ellipsis;'>"
+                f"{unit}</div>"
+            )
+        # Refresh the sidebar inputs if they already exist
+        for key, inp in refs["sensor_name_inputs"].items():
+            inp.value = sensor_names.get(key, DEFAULT_SENSOR_NAMES[key])
 
     def _on_delete_unit(unit_name: str):
         """Show a confirmation dialog before deleting the unit and all its data."""
@@ -946,6 +1002,12 @@ def index_page() -> None:
                 # Sensor names
                 with ui.element("div"):
                     ui.html("<div class='card-title'>Sensor Names</div>")
+                    refs["sensor_name_unit_label"] = ui.html(
+                        "<div style='font-size:0.68rem;color:var(--text-muted);"
+                        "font-family:Space Mono,monospace;margin-bottom:8px;"
+                        "white-space:nowrap;overflow:hidden;text-overflow:ellipsis;'>"
+                        "Select a unit first</div>"
+                    )
                     for key in ("sensor_1", "sensor_2", "sensor_3", "sensor_4"):
                         with ui.element("div").classes("sensor-name-row"):
                             ui.html(
@@ -953,7 +1015,7 @@ def index_page() -> None:
                                 f"{key.replace('_', ' ').upper()}</span>"
                             )
                             inp = ui.input(
-                                value=sensor_names.get(key, key)
+                                value=sensor_names.get(key, DEFAULT_SENSOR_NAMES[key])
                             ).props("dense outlined").style("flex:1;min-width:0;")
                             inp._props["input-class"] = "sensor-name-input"
                             refs["sensor_name_inputs"][key] = inp
