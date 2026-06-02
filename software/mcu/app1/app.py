@@ -128,11 +128,11 @@ class ThisMachine(BaseMachine):
         self._web_server.run()
 
     async def power_cycle_temp_sensors(self, delay=1.0):
-        # Set /TON high to remove power to the temp sensors
+        # Set /TON low to remove power to the temp sensors
         Pin(26, Pin.OUT, value=0)
         await asyncio.sleep(delay)
-        # Set /TON low to apply power to the temp sensors
-        Pin(26, Pin.OUT, value=0)
+        # Set /TON high to apply power to the temp sensors
+        Pin(26, Pin.OUT, value=1)
 
     async def app_task(self):
         """@brief Add your project code here.
@@ -194,6 +194,8 @@ class ThisMachine(BaseMachine):
                         paramDict[temp_key] = sensor.temperature()
                         paramDict[humidity_key] = sensor.humidity()
                     except Exception as exc:
+                        paramDict[temp_key] = "read_error"
+                        paramDict[humidity_key] = "read_error"
                         from io import StringIO      # on some ports use uio.StringIO
                         buf = StringIO()
                         sys.print_exception(exc, buf)
@@ -202,7 +204,7 @@ class ThisMachine(BaseMachine):
 
                         # As we had an issue reading a temperature sensor
                         # try power cycling the temperature sensors to recover.
-                        await self.power_cycle_temp_sensors(delay=0.25)
+                        await self.power_cycle_temp_sensors(delay=5)
 
                 self._ydev.update_json_dict(paramDict)
 
