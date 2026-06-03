@@ -167,7 +167,7 @@ GLOBAL_CSS = """
     --hum-color: #38bdf8;
     --red:       #f85149;
     --radius:    12px;
-    --sidebar-w: 260px;
+    --sidebar-w: fit-content;
 }
 
 *, *::before, *::after { box-sizing: border-box; }
@@ -260,6 +260,8 @@ body,
 
 .sidebar {
     width: var(--sidebar-w);
+    min-width: 180px;
+    max-width: 340px;
     flex-shrink: 0;
     background: var(--surface);
     border-right: 1px solid var(--border);
@@ -335,6 +337,10 @@ body,
     transition: all 0.12s;
     margin: 2px;
     white-space: nowrap;
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 .unit-chip:hover  { border-color: var(--accent); color: var(--text); }
 .unit-chip.active { border-color: var(--accent); background: rgba(249,115,22,0.15); color: var(--accent); }
@@ -429,9 +435,10 @@ body,
 .delete-btn:hover { border-color: var(--red); color: var(--red); background: rgba(248,81,73,0.12); }
 
 .unit-row {
-    display: inline-flex;
+    display: flex;
     align-items: center;
     margin: 2px;
+    width: 100%;
 }
 
 @media (max-width: 700px) {
@@ -949,7 +956,7 @@ def index_page() -> None:
                 with ui.element("div"):
                     ui.html("<div class='card-title'>Units</div>")
                     refs["chip_container"] = ui.element("div").style(
-                        "display:flex;flex-wrap:wrap;"
+                        "display:flex;flex-direction:column;width:100%;"
                     )
                     with refs["chip_container"]:
                         with ui.element("div").classes("loading-ring"):
