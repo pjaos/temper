@@ -21,6 +21,16 @@ from p3lib.boot_manager import BootManager
 from p3lib.helper import get_program_version, getHomePath
 from p3lib.netif import NetIF
 
+# To run the manual checkpoint one-liner to shrink the existing WAL file
+# immediately rather than waiting an hour run
+# bashpython3 -c "
+# import sqlite3
+# conn = sqlite3.connect('/root/.config/temper/temper_sensor_data.db')
+# r = conn.execute('PRAGMA wal_checkpoint(TRUNCATE)').fetchone()
+# print(f'busy={r[0]} log={r[1]} checkpointed={r[2]}')
+# conn.close()
+# "
+
 class LocalYViewCollector(object):
     """@brief This collects data from YView devices on the local LAN only as opposed to connecting to the
               ICONS server and collecting data from there.
@@ -274,7 +284,8 @@ class TemperDB(object):
         self._start_temper_hardware_listener()
 
     # Prune once per day while running
-    _PRUNE_INTERVAL_SECS = 86400
+    _PRUNE_INTERVAL_SECS      = 86400
+    _CHECKPOINT_INTERVAL_SECS = 3600   # force a WAL checkpoint every hour
 
     def _prune_old_readings(self):
         """@brief Delete readings older than --max_age_days if the option is set."""
@@ -286,6 +297,21 @@ class TemperDB(object):
             else:
                 self._uio.debug(f"Prune complete: no readings older than {days} day(s)")
 
+    def _checkpoint_wal(self):
+        """@brief Force a WAL checkpoint to flush the -wal file back into the main DB.
+        Uses TRUNCATE mode so the WAL file is reset to zero bytes afterwards."""
+        try:
+            with self.get_connection() as conn:
+                # TRUNCATE checkpoints all frames and resets the WAL file to empty
+                result = conn.execute("PRAGMA wal_checkpoint(TRUNCATE)").fetchone()
+                busy, log, checkpointed = result[0], result[1], result[2]
+                if busy:
+                    self._uio.debug("WAL checkpoint: could not obtain lock (busy), will retry next cycle")
+                else:
+                    self._uio.debug(f"WAL checkpoint: {checkpointed}/{log} frames checkpointed")
+        except Exception as exc:
+            self._uio.error(f"WAL checkpoint failed: {exc}")
+
     def _start_temper_hardware_listener(self):
         """@brief Search for all TEMPER units on the LAN and display stats received from all units."""
         # Start running the local collector in a separate thread
@@ -293,11 +319,13 @@ class TemperDB(object):
         self._localYViewCollector.setValidProductIDList(TemperDB.VALID_PRODUCT_ID_LIST)
         self._localYViewCollector.addDevListener(self)
         self._localYViewCollector.start()
-        # Wait here until user CTRL-C; prune old records once a day
+        # Wait here until user CTRL-C; checkpoint WAL hourly, prune old records daily
         elapsed = 0
         while True:
             sleep(1)
             elapsed += 1
+            if elapsed % TemperDB._CHECKPOINT_INTERVAL_SECS == 0:
+                self._checkpoint_wal()
             if elapsed >= TemperDB._PRUNE_INTERVAL_SECS:
                 self._prune_old_readings()
                 elapsed = 0
