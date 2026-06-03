@@ -5,8 +5,8 @@
 	(uuid "ad9b79b0-4738-4cc8-a254-afb39ba62b16")
 	(paper "A4")
 	(title_block
-		(date "2026-05-14")
-		(rev "1.9")
+		(date "2026-06-03")
+		(rev "12.0")
 		(comment 1 "1.8 - 1.9 no changes to schematic. C2 moved on PCB.")
 	)
 	(lib_symbols
@@ -5475,12 +5475,6 @@
 		(uuid "40046124-046f-472f-ac26-51e828cc8200")
 	)
 	(junction
-		(at 73.66 52.07)
-		(diameter 0)
-		(color 0 0 0 0)
-		(uuid "489f18a8-f92a-4c8f-8261-9f23dc672ae5")
-	)
-	(junction
 		(at 43.18 52.07)
 		(diameter 0)
 		(color 0 0 0 0)
@@ -5497,6 +5491,12 @@
 		(diameter 0)
 		(color 0 0 0 0)
 		(uuid "51b61c4f-293d-4972-b896-e7874f7cbc0c")
+	)
+	(junction
+		(at 74.93 52.07)
+		(diameter 0)
+		(color 0 0 0 0)
+		(uuid "554e15f8-bc1f-407b-92fa-655a738a03af")
 	)
 	(junction
 		(at 31.75 31.75)
@@ -5563,12 +5563,6 @@
 		(diameter 0)
 		(color 0 0 0 0)
 		(uuid "796fe883-53b8-493d-96c0-db81ede42813")
-	)
-	(junction
-		(at 73.66 67.31)
-		(diameter 0)
-		(color 0 0 0 0)
-		(uuid "7b46db40-79f1-4958-b39f-907936612c45")
 	)
 	(junction
 		(at 234.95 90.17)
@@ -5647,6 +5641,12 @@
 		(diameter 0)
 		(color 0 0 0 0)
 		(uuid "ba198fe4-5cfe-4ee1-b599-8ace141596c2")
+	)
+	(junction
+		(at 74.93 67.31)
+		(diameter 0)
+		(color 0 0 0 0)
+		(uuid "bb9756ca-bc3b-4cfd-b495-19c2e6291615")
 	)
 	(junction
 		(at 200.66 53.34)
@@ -5807,6 +5807,16 @@
 			(type default)
 		)
 		(uuid "012b85b7-6ca6-4665-9899-685f64081567")
+	)
+	(wire
+		(pts
+			(xy 74.93 67.31) (xy 82.55 67.31)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "01ac8a6e-18f2-4c34-ae8a-8fe878d2ea8e")
 	)
 	(wire
 		(pts
@@ -6190,16 +6200,6 @@
 	)
 	(wire
 		(pts
-			(xy 73.66 67.31) (xy 82.55 67.31)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "290ba29e-bf96-48d2-a821-af66546a3325")
-	)
-	(wire
-		(pts
 			(xy 180.34 86.36) (xy 180.34 90.17)
 		)
 		(stroke
@@ -6470,7 +6470,7 @@
 	)
 	(wire
 		(pts
-			(xy 81.28 52.07) (xy 73.66 52.07)
+			(xy 81.28 52.07) (xy 74.93 52.07)
 		)
 		(stroke
 			(width 0)
@@ -6580,7 +6580,7 @@
 	)
 	(wire
 		(pts
-			(xy 73.66 67.31) (xy 73.66 63.5)
+			(xy 74.93 67.31) (xy 74.93 63.5)
 		)
 		(stroke
 			(width 0)
@@ -6920,7 +6920,7 @@
 	)
 	(wire
 		(pts
-			(xy 73.66 52.07) (xy 62.23 52.07)
+			(xy 62.23 52.07) (xy 74.93 52.07)
 		)
 		(stroke
 			(width 0)
@@ -7440,7 +7440,7 @@
 	)
 	(wire
 		(pts
-			(xy 73.66 52.07) (xy 73.66 55.88)
+			(xy 74.93 52.07) (xy 74.93 55.88)
 		)
 		(stroke
 			(width 0)
@@ -7540,7 +7540,7 @@
 	)
 	(wire
 		(pts
-			(xy 72.39 67.31) (xy 73.66 67.31)
+			(xy 72.39 67.31) (xy 74.93 67.31)
 		)
 		(stroke
 			(width 0)
@@ -7657,6 +7657,16 @@
 			(type default)
 		)
 		(uuid "d1ec915f-2afd-4c08-a1de-479b54321b83")
+	)
+	(wire
+		(pts
+			(xy 72.39 62.23) (xy 72.39 67.31)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "d3e4af3b-c62f-47e3-b633-32a8a697d37e")
 	)
 	(wire
 		(pts
@@ -9965,7 +9975,7 @@
 				(justify left)
 			)
 		)
-		(property "Value" "100uf 16v"
+		(property "Value" "DNF"
 			(at 54.61 138.8109 0)
 			(show_name no)
 			(do_not_autoplace no)
@@ -10471,8 +10481,7 @@
 	)
 	(symbol
 		(lib_id "pja_1:DMP3099L-7")
-		(at 62.23 64.77 0)
-		(mirror y)
+		(at 62.23 64.77 180)
 		(unit 1)
 		(body_style 1)
 		(exclude_from_sim no)
@@ -10482,7 +10491,7 @@
 		(dnp no)
 		(uuid "4fb014fa-20fa-4f53-a069-d0f9b16c5e16")
 		(property "Reference" "M1"
-			(at 55.88 63.627 0)
+			(at 55.88 65.913 0)
 			(show_name no)
 			(do_not_autoplace no)
 			(effects
@@ -10493,7 +10502,7 @@
 			)
 		)
 		(property "Value" "AO3401A"
-			(at 55.88 66.167 0)
+			(at 55.88 63.373 0)
 			(show_name no)
 			(do_not_autoplace no)
 			(effects
@@ -10504,7 +10513,7 @@
 			)
 		)
 		(property "Footprint" "Package_TO_SOT_SMD:SOT-23-3"
-			(at 61.468 60.96 0)
+			(at 61.468 68.58 0)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
@@ -12668,7 +12677,7 @@
 	)
 	(symbol
 		(lib_id "Device:R")
-		(at 73.66 59.69 0)
+		(at 74.93 59.69 0)
 		(unit 1)
 		(body_style 1)
 		(exclude_from_sim no)
@@ -12679,7 +12688,7 @@
 		(fields_autoplaced yes)
 		(uuid "b3439e9a-a658-4c6d-892f-69dfcc9e92ea")
 		(property "Reference" "R5"
-			(at 76.2 58.4199 0)
+			(at 77.47 58.4199 0)
 			(show_name no)
 			(do_not_autoplace no)
 			(effects
@@ -12690,7 +12699,7 @@
 			)
 		)
 		(property "Value" "100k"
-			(at 76.2 60.9599 0)
+			(at 77.47 60.9599 0)
 			(show_name no)
 			(do_not_autoplace no)
 			(effects
@@ -12701,7 +12710,7 @@
 			)
 		)
 		(property "Footprint" "Resistor_SMD:R_0402_1005Metric_Pad0.72x0.64mm_HandSolder"
-			(at 71.882 59.69 90)
+			(at 73.152 59.69 90)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
@@ -12712,7 +12721,7 @@
 			)
 		)
 		(property "Datasheet" ""
-			(at 73.66 59.69 0)
+			(at 74.93 59.69 0)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
@@ -12723,7 +12732,7 @@
 			)
 		)
 		(property "Description" "Resistor"
-			(at 73.66 59.69 0)
+			(at 74.93 59.69 0)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
@@ -12734,7 +12743,7 @@
 			)
 		)
 		(property "LCSC" "C25741"
-			(at 73.66 59.69 0)
+			(at 74.93 59.69 0)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
