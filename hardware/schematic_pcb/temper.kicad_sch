@@ -5717,10 +5717,6 @@
 		(uuid "07fbbebc-f940-40a5-b136-494f929da44b")
 	)
 	(no_connect
-		(at 167.64 -29.21)
-		(uuid "263a85dd-7643-43e9-bb4f-01619e836e63")
-	)
-	(no_connect
 		(at 125.73 125.73)
 		(uuid "6d046674-de24-4891-89fc-77d657903173")
 	)
@@ -8092,7 +8088,7 @@
 		)
 		(uuid "29ae625d-eb41-4b1b-9d39-9b736920c2c1")
 	)
-	(label "{slash}TON"
+	(label "TON"
 		(at 129.54 148.59 0)
 		(effects
 			(font
@@ -8242,7 +8238,7 @@
 		)
 		(uuid "9f200a1e-66ba-42cd-9b65-f50e061258d0")
 	)
-	(label "{slash}TON"
+	(label "TON"
 		(at 113.03 64.77 0)
 		(effects
 			(font
