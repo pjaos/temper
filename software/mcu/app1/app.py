@@ -128,10 +128,10 @@ class ThisMachine(BaseMachine):
         self._web_server.run()
 
     async def power_cycle_temp_sensors(self, delay=1.0):
-        # Set /TON low to remove power to the temp sensors
+        # Set TON low to remove power to the temp sensors
         Pin(26, Pin.OUT, value=0)
         await asyncio.sleep(delay)
-        # Set /TON high to apply power to the temp sensors
+        # Set TON high to apply power to the temp sensors
         Pin(26, Pin.OUT, value=1)
 
     async def app_task(self):
@@ -149,8 +149,8 @@ class ThisMachine(BaseMachine):
         sensor4 = dht.DHT22(Pin(19, Pin.OUT, Pin.PULL_UP))
 
         # scaling factors for voltages, empirically evaluated.
-        scale_vbat = 2693
-        scale_3v3 = 5144
+        scale_vbat = 2978
+        scale_3v3 = 5524
 
         adc_vbat = ADC(Pin(34, Pin.IN))
         adc_3v3 = ADC(Pin(35, Pin.IN))
