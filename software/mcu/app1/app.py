@@ -83,12 +83,15 @@ class ThisMachine(BaseMachine):
     PARAM_SENSOR_4_TEMP = "PARAM_SENSOR_4_TEMP"
     PARAM_SENSOR_4_HUMIDITY = "PARAM_SENSOR_4_HUMIDITY"
     PARAM_RSSI = "PARAM_RSSI"
+    PARAM_SENSOR_READ_ERROR_COUNT = "PARAM_SENSOR_READ_ERROR_COUNT"
     EXCEPTION_TEXT = "EXCEPTION_TEXT"
 
     def __init__(self, uo, machine_config):
         super().__init__(uo, machine_config)
         self._startTime = time()
         self._ydev = None
+        self._sensor_power_pin = Pin(26, Pin.OUT, value=0)
+        self._sensor_read_error_count=0
 
         # Enable watchdog timer here if required.
         # If the WiFi goes down then we can
@@ -127,17 +130,18 @@ class ThisMachine(BaseMachine):
 
         self._web_server.run()
 
-    async def power_cycle_temp_sensors(self, delay=1.0):
+    async def power_cycle_temp_sensors(self, delay=10.0):
         # Set TON low to remove power to the temp sensors
-        Pin(26, Pin.OUT, value=0)
+        self._sensor_power_pin.value(0)
         await asyncio.sleep(delay)
         # Set TON high to apply power to the temp sensors
-        Pin(26, Pin.OUT, value=1)
+        self._sensor_power_pin.value(1)
 
     async def app_task(self):
         """@brief Add your project code here.
                   Make sure await asyncio.sleep(1) is called frequently to ensure other tasks get CPU time."""
-        await self.power_cycle_temp_sensors()
+        # Set TON high to apply power to the temp sensors
+        self._sensor_power_pin.value(1)
         # Apply power to the voltage rail detectors
         Pin(13, Pin.OUT, value=1)
         # Disable power LED to save power
@@ -204,7 +208,11 @@ class ThisMachine(BaseMachine):
 
                         # As we had an issue reading a temperature sensor
                         # try power cycling the temperature sensors to recover.
-                        await self.power_cycle_temp_sensors(delay=5)
+                        await self.power_cycle_temp_sensors()
+
+                        self._sensor_read_error_count += 1
+
+                paramDict[ThisMachine.PARAM_SENSOR_READ_ERROR_COUNT] = self._sensor_read_error_count
 
                 self._ydev.update_json_dict(paramDict)
 
