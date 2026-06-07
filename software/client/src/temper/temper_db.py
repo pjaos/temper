@@ -1,12 +1,15 @@
 #!/usr/bin/env python3
 
 import os
+import sys
 import argparse
 import socket
 import json
 import struct
 import psutil
-import rich
+from rich import print_json
+from rich.console import Console
+from rich.json import JSON
 import sqlite3
 import traceback
 
@@ -330,6 +333,12 @@ class TemperDB(object):
                 self._prune_old_readings()
                 elapsed = 0
 
+    def _json_to_str(self, data: dict) -> str:
+        """Render a dict as coloured JSON text suitable for logging."""
+        console = Console(record=True, highlight=True)
+        console.print(JSON(json.dumps(data)))
+        return console.export_text()
+
     def hear(self, devDict):
         """@brief Called when data is received from the device.
            @param devDict The device dict."""
@@ -337,11 +346,22 @@ class TemperDB(object):
         if self._options.address:
             if TemperDB.IP_ADDRESS_KEY in devDict and devDict[TemperDB.IP_ADDRESS_KEY] == self._options.address:
                 if self._uio.isDebugEnabled():
-                    rich.print_json(json.dumps(devDict))
+                    if sys.stdout.isatty():
+                        print_json(json.dumps(devDict))
+
+                    else:
+                        op = self._json_to_str(devDict)
+                        self._uio.debug(op)
+
         # If the user wants to view data from all units.
         else:
             if self._uio.isDebugEnabled():
-                rich.print_json(json.dumps(devDict))
+                if sys.stdout.isatty():
+                    print_json(json.dumps(devDict))
+
+                else:
+                    op = self._json_to_str(devDict)
+                    self._uio.debug(op)
 
         try:
             self.save_sensor_json(devDict)
