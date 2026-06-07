@@ -1,4 +1,3 @@
-import sys
 import asyncio
 from time import time
 
@@ -83,7 +82,6 @@ class ThisMachine(BaseMachine):
     PARAM_SENSOR_4_TEMP = "PARAM_SENSOR_4_TEMP"
     PARAM_SENSOR_4_HUMIDITY = "PARAM_SENSOR_4_HUMIDITY"
     PARAM_RSSI = "PARAM_RSSI"
-    PARAM_SENSOR_READ_ERROR_COUNT = "PARAM_SENSOR_READ_ERROR_COUNT"
     EXCEPTION_TEXT = "EXCEPTION_TEXT"
 
     def __init__(self, uo, machine_config):
@@ -152,6 +150,23 @@ class ThisMachine(BaseMachine):
         sensor3 = dht.DHT22(Pin(18, Pin.OUT, Pin.PULL_UP))
         sensor4 = dht.DHT22(Pin(19, Pin.OUT, Pin.PULL_UP))
 
+        # Load this with a list of the connected temp sensors
+        param_list = []
+        all_ports_table = [[sensor1, ThisMachine.PARAM_SENSOR_1_TEMP, ThisMachine.PARAM_SENSOR_1_HUMIDITY, 1],
+                           [sensor2, ThisMachine.PARAM_SENSOR_2_TEMP, ThisMachine.PARAM_SENSOR_2_HUMIDITY, 2],
+                           [sensor3, ThisMachine.PARAM_SENSOR_3_TEMP, ThisMachine.PARAM_SENSOR_3_HUMIDITY, 3],
+                           [sensor4, ThisMachine.PARAM_SENSOR_4_TEMP, ThisMachine.PARAM_SENSOR_4_HUMIDITY, 4]]
+        for row in all_ports_table:
+            try:
+                self.pat_wdt()
+                sensor = row[0]
+                sensor.measure()
+                # Successful measurement means a sensor must be connected.
+                param_list.append(row)
+            except Exception:
+                # If we get here then the sensor is not connected
+                pass
+
         # scaling factors for voltages, empirically evaluated.
         scale_vbat = 2978
         scale_3v3 = 5524
@@ -185,34 +200,16 @@ class ThisMachine(BaseMachine):
                 board_temp_c = ( volts - ThisMachine.MCP9700_VOUT_0C ) / ThisMachine.MCP9700_TC
                 paramDict[ThisMachine.PARAM_BOARD_TEMP] = f"{board_temp_c:.1f}"
 
-                # Read each sensor. If not connected ignore error and read the next
-                param_list = [[sensor1, ThisMachine.PARAM_SENSOR_1_TEMP, ThisMachine.PARAM_SENSOR_1_HUMIDITY, 1],
-                              [sensor2, ThisMachine.PARAM_SENSOR_2_TEMP, ThisMachine.PARAM_SENSOR_2_HUMIDITY, 2],
-                              [sensor3, ThisMachine.PARAM_SENSOR_3_TEMP, ThisMachine.PARAM_SENSOR_3_HUMIDITY, 3],
-                              [sensor4, ThisMachine.PARAM_SENSOR_4_TEMP, ThisMachine.PARAM_SENSOR_4_HUMIDITY, 4]]
-
+                # Read each connected sensor.
                 for sensor, temp_key, humidity_key, sensor_number in param_list:
                     try:
                         self.pat_wdt()
                         sensor.measure()
                         paramDict[temp_key] = sensor.temperature()
                         paramDict[humidity_key] = sensor.humidity()
-                    except Exception as exc:
-                        paramDict[temp_key] = "read_error"
-                        paramDict[humidity_key] = "read_error"
-                        from io import StringIO      # on some ports use uio.StringIO
-                        buf = StringIO()
-                        sys.print_exception(exc, buf)
-                        stack_str = buf.getvalue()
-                        paramDict[ThisMachine.EXCEPTION_TEXT] = f"Sensor {sensor_number} ERROR: {stack_str}"
-
-                        # As we had an issue reading a temperature sensor
-                        # try power cycling the temperature sensors to recover.
-                        await self.power_cycle_temp_sensors()
-
-                        self._sensor_read_error_count += 1
-
-                paramDict[ThisMachine.PARAM_SENSOR_READ_ERROR_COUNT] = self._sensor_read_error_count
+                    except Exception:
+                        # If we get a read error on a connected sensor we power cycle the unit to recover.
+                        Pin(25, Pin.OUT, value=1)
 
                 self._ydev.update_json_dict(paramDict)
 
