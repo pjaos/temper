@@ -210,6 +210,9 @@ class ThisMachine(BaseMachine):
                         sensor.measure()
                         gc.enable()   # enable after read
                         paramDict[temp_key] = sensor.temperature()
+                        # if the temperature read drops bellow 0° Kelvin we have a read error
+                        if paramDict[temp_key] < -273:
+                            raise Exception("Invalid temperature")
                         paramDict[humidity_key] = sensor.humidity()
                     except Exception:
                         # If we get a read error on a connected sensor we power cycle the unit to recover.
