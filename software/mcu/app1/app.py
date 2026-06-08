@@ -1,4 +1,5 @@
 import asyncio
+import gc
 from time import time
 
 from lib.uo import UO
@@ -204,12 +205,17 @@ class ThisMachine(BaseMachine):
                 for sensor, temp_key, humidity_key, sensor_number in param_list:
                     try:
                         self.pat_wdt()
+                        gc.collect()  # Call this BEFORE every DHT read cycle
+                        gc.disable()  # Disable during reads, as a gc.collect() during a read may cause DHT22 state machine to lockup.
                         sensor.measure()
+                        gc.enable()   # enable after read
                         paramDict[temp_key] = sensor.temperature()
                         paramDict[humidity_key] = sensor.humidity()
                     except Exception:
                         # If we get a read error on a connected sensor we power cycle the unit to recover.
                         Pin(25, Pin.OUT, value=1)
+                    # 1 second between each sensor read.
+                    await asyncio.sleep(1)
 
                 self._ydev.update_json_dict(paramDict)
 
