@@ -1,6 +1,7 @@
 import asyncio
 import gc
 from time import time
+import sys, io
 
 from lib.uo import UO
 from lib.config import MachineConfig
@@ -84,6 +85,10 @@ class ThisMachine(BaseMachine):
     PARAM_SENSOR_4_HUMIDITY = "PARAM_SENSOR_4_HUMIDITY"
     PARAM_RSSI = "PARAM_RSSI"
     EXCEPTION_TEXT = "EXCEPTION_TEXT"
+    DETECTED_SENSOR_LIST = "DETECTED_SENSOR_LIST"
+
+    MIN_DHT22_TEMP = -40.0
+    MAX_DHT22_TEMP = 80.0
 
     def __init__(self, uo, machine_config):
         super().__init__(uo, machine_config)
@@ -136,6 +141,33 @@ class ThisMachine(BaseMachine):
         # Set TON high to apply power to the temp sensors
         self._sensor_power_pin.value(1)
 
+    async def _read_sensor(self, sensor, multi_read_delay=5, max_retry=3):
+        """@return [temp, humidity] on success, or None if recovery was triggered."""
+        read_count = 0
+        while True:
+            try:
+                self.pat_wdt()
+                gc.collect()
+                gc.disable()
+                try:
+                    sensor.measure()
+                    temp = sensor.temperature()
+                    humidity = sensor.humidity()
+                    if (ThisMachine.MIN_DHT22_TEMP <= temp <= ThisMachine.MAX_DHT22_TEMP
+                            and 0 <= humidity <= 100):
+                        return [temp, humidity]          # <-- the missing return
+                except Exception:
+                    pass
+
+            finally:
+                gc.enable()                              # runs even on the return above
+
+            read_count += 1
+            if read_count > max_retry:
+                Pin(25, Pin.OUT, value=1)                # trigger recovery
+                return None                              # don't spin; let the cycle/reset take over
+            await asyncio.sleep(multi_read_delay)
+
     async def app_task(self):
         """@brief Add your project code here.
                   Make sure await asyncio.sleep(1) is called frequently to ensure other tasks get CPU time."""
@@ -146,6 +178,9 @@ class ThisMachine(BaseMachine):
         # Disable power LED to save power
         Pin(22, Pin.OUT, value=0)
 
+        paramDict = {}
+        paramDict[ThisMachine.EXCEPTION_TEXT] = ""
+
         sensor1 = dht.DHT22(Pin(16, Pin.OUT, Pin.PULL_UP))
         sensor2 = dht.DHT22(Pin(17, Pin.OUT, Pin.PULL_UP))
         sensor3 = dht.DHT22(Pin(18, Pin.OUT, Pin.PULL_UP))
@@ -153,6 +188,7 @@ class ThisMachine(BaseMachine):
 
         # Load this with a list of the connected temp sensors
         param_list = []
+        detected_sensors = []
         all_ports_table = [[sensor1, ThisMachine.PARAM_SENSOR_1_TEMP, ThisMachine.PARAM_SENSOR_1_HUMIDITY, 1],
                            [sensor2, ThisMachine.PARAM_SENSOR_2_TEMP, ThisMachine.PARAM_SENSOR_2_HUMIDITY, 2],
                            [sensor3, ThisMachine.PARAM_SENSOR_3_TEMP, ThisMachine.PARAM_SENSOR_3_HUMIDITY, 3],
@@ -164,9 +200,13 @@ class ThisMachine(BaseMachine):
                 sensor.measure()
                 # Successful measurement means a sensor must be connected.
                 param_list.append(row)
+                detected_sensors.append(f"{row[3]}")
+
             except Exception:
                 # If we get here then the sensor is not connected
                 pass
+
+        paramDict[ThisMachine.DETECTED_SENSOR_LIST] = ",".join(detected_sensors)
 
         # scaling factors for voltages, empirically evaluated.
         scale_vbat = 2978
@@ -175,9 +215,6 @@ class ThisMachine(BaseMachine):
         adc_vbat = ADC(Pin(34, Pin.IN))
         adc_3v3 = ADC(Pin(35, Pin.IN))
         adc_mcp9700 = ADC(Pin(33, Pin.IN))
-
-        paramDict = {}
-        paramDict[ThisMachine.EXCEPTION_TEXT] = ""
 
         self._web_server.setParamDict(paramDict)
 
@@ -201,28 +238,28 @@ class ThisMachine(BaseMachine):
                 board_temp_c = ( volts - ThisMachine.MCP9700_VOUT_0C ) / ThisMachine.MCP9700_TC
                 paramDict[ThisMachine.PARAM_BOARD_TEMP] = f"{board_temp_c:.1f}"
 
-                # Read each connected sensor.
-                for sensor, temp_key, humidity_key, sensor_number in param_list:
-                    try:
-                        self.pat_wdt()
-                        gc.collect()  # Call this BEFORE every DHT read cycle
-                        gc.disable()  # Disable during reads, as a gc.collect() during a read may cause DHT22 state machine to lockup.
-                        sensor.measure()
-                        gc.enable()   # enable after read
-                        paramDict[temp_key] = sensor.temperature()
-                        # if the temperature read drops bellow 0° Kelvin we have a read error
-                        if paramDict[temp_key] < -273:
-                            raise Exception("Invalid temperature")
-                        paramDict[humidity_key] = sensor.humidity()
-                    except Exception:
-                        # If we get a read error on a connected sensor we power cycle the unit to recover.
-                        Pin(25, Pin.OUT, value=1)
+                # Read each connected sensor. sensor_number is currently unused.
+                for row in param_list:
+                    sensor=row[0]
+                    temp_key=row[1]
+                    humidity_key=row[2]
+
+                    temperature, humidity = await self._read_sensor(sensor)
+
+                    paramDict[temp_key] = temperature
+                    paramDict[humidity_key] = humidity
+
                     # 1 second between each sensor read.
                     await asyncio.sleep(1)
 
                 self._ydev.update_json_dict(paramDict)
 
             except Exception as ex:
+                buf = io.StringIO()
+                sys.print_exception(ex, buf)
+                trace_str = buf.getvalue()
+                paramDict.update({ThisMachine.EXCEPTION_TEXT: trace_str})
+                self._ydev.update_json_dict(paramDict)
                 self.error(str(ex))
 
             # Don't read DHT22 sensors more than once every 2 seconds.
